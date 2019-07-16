@@ -13,38 +13,39 @@ type opsManagerAPI struct {
 
 // OpsManagerUser request object which identifies a user
 type OpsManagerUser struct {
-	Username string `json:"username"`
-	Password string `json:"password,omitempty"`
-	FirstName string `json:"firstName"`
-	LastName string `json:"lastName"`
+	Username     string `json:"username"`
+	Password     string `json:"password,omitempty"`
+	FirstName    string `json:"firstName"`
+	LastName     string `json:"lastName"`
 	EmailAddress string `json:"emailAddress,omitempty"`
 }
 
-// OpsManagerUserRole denotes a single user role
+// UserRole denotes a single user role
 type UserRole struct {
 	RoleName string `json:"roleName"`
-	GroupID string `json:"groupId,omitempty"`
-	OrgID string `json:"orgId,omitempty"`
+	GroupID  string `json:"groupId,omitempty"`
+	OrgID    string `json:"orgId,omitempty"`
 }
 
-// OpsManagerUserLink denotes a single user link
+// UserLink denotes a single user link
 type UserLink struct {
-	HREF string `json:"groupId"`
+	HREF  string `json:"groupId"`
 	OrgID string `json:"orgId"`
 }
 
+// UserResponse wrapper for a user response, augmented with a few extra fields
 type UserResponse struct {
 	OpsManagerUser
 
-	ID string `json:"id"`
-	Links []UserLink  `json:"links,omitempty"`
-	Roles []UserRole  `json:"roles,omitempty"`
+	ID    string     `json:"id"`
+	Links []UserLink `json:"links,omitempty"`
+	Roles []UserRole `json:"roles,omitempty"`
 }
 
 // CreateFirstUserResponse API response for the CreateFirstUser() call
 type CreateFirstUserResponse struct {
-	ApiKey string `json:"apiKey"`
-	User UserResponse `json:"user"`
+	APIKey string       `json:"apiKey"`
+	User   UserResponse `json:"user"`
 }
 
 // OpsManagerClient defines the API actions implemented in this client
@@ -56,9 +57,8 @@ type OpsManagerClient interface {
 
 // NewOpsManagerClient builds a new API client for connecting to Ops Manager
 func NewOpsManagerClient(resolver URLResolver) OpsManagerClient {
-	return opsManagerAPI{BasicHTTPOperation: NewClient(), resolver:resolver}
+	return opsManagerAPI{BasicHTTPOperation: NewClient(), resolver: resolver}
 }
-
 
 // CreateFirstUser registers the first ever Ops Manager user (global owner)
 // https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/

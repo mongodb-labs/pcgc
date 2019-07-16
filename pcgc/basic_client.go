@@ -2,8 +2,8 @@ package pcgc
 
 import (
 	"io"
+	"net"
 	"net/http"
-	"time"
 
 	"gopkg.in/errgo.v1"
 )
@@ -37,16 +37,24 @@ func (resp HTTPResponse) IsError() bool {
 	return resp.err != nil
 }
 
-// NewClient build a new HTTP client
+// NewClient build a new HTTP client with default timeouts
 func NewClient() BasicHTTPOperation {
+	return NewClientWithTimeouts(InitTimeouts())
+}
+
+// NewClientWithTimeouts build a new HTTP client with specified timeouts
+func NewClientWithTimeouts(timeouts *HTTPClientTimeouts) BasicHTTPOperation {
 	return basicHTTPClient{client: &http.Client{
 		Transport: &http.Transport{
-			ExpectContinueTimeout: 1 * time.Second,
-			IdleConnTimeout:       RequestTimeout,
-			ResponseHeaderTimeout: ResponseHeaderTimeout,
-			TLSHandshakeTimeout:   RequestTimeout,
+			DialContext: (&net.Dialer{
+				Timeout: timeouts.DialTimeout,
+			}).DialContext,
+			ExpectContinueTimeout: timeouts.ExpectContinueTimeout,
+			IdleConnTimeout:       timeouts.IdleConnectionTimeout,
+			ResponseHeaderTimeout: timeouts.ResponseHeaderTimeout,
+			TLSHandshakeTimeout:   timeouts.TLSHandshakeTimeout,
 		},
-		Timeout: HTTPRequestResponseTimeout,
+		Timeout: timeouts.GlobalTimeout,
 	}}
 }
 
