@@ -6,7 +6,7 @@ and [Cloud Manager](https://docs.cloudmanager.mongodb.com/reference/api/) Public
 
 **This project is currently in development and is not yet ready for production use.**
 
-This library is licensed under the terms of the [GNU Affero General Public License v3.0](https://opensource.org/licenses/AGPL-3.0).
+This library is licensed under the terms of the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 
 ### Desired feature set for release v0.1.0
