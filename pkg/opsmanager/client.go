@@ -41,6 +41,7 @@ type Client interface {
 	httpclient.BasicHTTPOperation
 
 	CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error)
+	GetAllProjects() (Projects, error)
 }
 
 // NewClient builds a new API client for connecting to Ops Manager

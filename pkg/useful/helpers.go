@@ -7,7 +7,7 @@ import "log"
 // of errors, would only make the code harder to read
 func PanicOnUnrecoverableError(err error) {
 	if err != nil {
-		log.Panicf("Did not expect a failure, but got: %v", err)
+		log.Panicf("[ERROR] did not expect a failure, but got: %v", err)
 	}
 }
 
@@ -17,6 +17,6 @@ func PanicOnUnrecoverableError(err error) {
 func LogError(action func() error) {
 	err := action()
 	if err != nil {
-		log.Printf("Unexpected error: %v", err)
+		log.Printf("[ERROR] unexpected err: %v", err)
 	}
 }

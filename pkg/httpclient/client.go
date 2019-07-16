@@ -18,6 +18,7 @@ package httpclient
 
 import (
 	"fmt"
+	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"gopkg.in/errgo.v1"
 	"io"
 	"net"
@@ -121,6 +122,20 @@ func (cl basicHTTPClient) PatchJSON(url string, body io.Reader) (resp HTTPRespon
 // Delete executes a DELETE request
 func (cl basicHTTPClient) Delete(url string) (resp HTTPResponse) {
 	return cl.genericJSONRequest("DELETE", url, nil, []int{http.StatusOK})
+}
+
+// CloseResponseBodyIfNotNil simple helper which can ensure a response's body is correctly closed, if one exists
+func CloseResponseBodyIfNotNil(resp HTTPResponse) {
+	if resp.Response == nil {
+		return
+	}
+
+	if resp.Response.Body == nil {
+		return
+	}
+
+	// if a body exists, attempt to close it and log any errors
+	useful.LogError(resp.Response.Body.Close)
 }
 
 func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Reader, expectedStatuses []int) (resp HTTPResponse) {

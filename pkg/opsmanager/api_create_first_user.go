@@ -3,6 +3,7 @@ package opsmanager
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/mongodb-labs/pcgc/pkg/httpclient"
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 )
 
@@ -25,18 +26,12 @@ type UserRole struct {
 	OrgID    string `json:"orgId,omitempty"`
 }
 
-// UserLink denotes a single user link
-type UserLink struct {
-	HREF  string `json:"groupId"`
-	OrgID string `json:"orgId"`
-}
-
 // UserResponse wrapper for a user response, augmented with a few extra fields
 type UserResponse struct {
 	User
 
 	ID    string     `json:"id"`
-	Links []UserLink `json:"links,omitempty"`
+	Links []Link     `json:"links,omitempty"`
 	Roles []UserRole `json:"roles,omitempty"`
 }
 
@@ -61,10 +56,7 @@ func (api opsManagerAPI) CreateFirstUser(user User, whitelistIP string) (CreateF
 	if resp.IsError() {
 		return result, resp.Err
 	}
-
-	if resp.Response != nil && resp.Response.Body != nil {
-		defer useful.LogError(resp.Response.Body.Close)
-	}
+	defer httpclient.CloseResponseBodyIfNotNil(resp)
 
 	decoder := json.NewDecoder(resp.Response.Body)
 	err2 := decoder.Decode(&result)
