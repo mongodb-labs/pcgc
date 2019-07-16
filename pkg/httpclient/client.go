@@ -14,6 +14,11 @@
 // Then, to make a request, call one of the service methods, e.g.:
 //		resp := client.Get("http://site/path")
 //
+// Once you have an user and a corresponding public API key, you can issue authenticated requests,
+// by constructing a new client with the appropriate credentials:
+//
+//		client := httpclient.NewClientWithAuthentication(username, publicAPIToken)
+//
 package httpclient
 
 import (
@@ -24,6 +29,8 @@ import (
 	"net"
 	"net/http"
 	"runtime"
+
+	digest "github.com/Sectorbob/mlab-ns2/gae/ns/digest"
 )
 
 // ContentTypeJSON defines the JSON content type
@@ -51,6 +58,7 @@ func init() {
 
 type basicHTTPClient struct {
 	client *http.Client
+	auth   *digest.Transport
 }
 
 // HTTPResponse wrapper for HTTP response objects
@@ -78,12 +86,12 @@ func (resp HTTPResponse) IsError() bool {
 	return resp.Err != nil
 }
 
-// NewClient build a new HTTP client with default timeouts
+// NewClient builds a new HTTP client with default timeouts
 func NewClient() BasicHTTPOperation {
 	return NewClientWithTimeouts(InitTimeouts())
 }
 
-// NewClientWithTimeouts build a new HTTP client with specified timeouts
+// NewClientWithTimeouts builds a new HTTP client with specified timeouts
 func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
 	return basicHTTPClient{client: &http.Client{
 		Transport: &http.Transport{
@@ -97,6 +105,13 @@ func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
 		},
 		Timeout: timeouts.GlobalTimeout,
 	}}
+}
+
+// NewClientWithAuthentication builds a new client which can use Digest authentication to make authenticated calls
+func NewClientWithAuthentication(user string, publicAPIToken string) BasicHTTPOperation {
+	client := NewClientWithTimeouts(InitTimeouts()).(basicHTTPClient)
+	client.auth = digest.NewTransport(user, publicAPIToken)
+	return client
 }
 
 // Get retrieves the specified URL
@@ -152,8 +167,16 @@ func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Re
 		req.Header.Add("Content-Type", ContentTypeJSON)
 	}
 
-	resp.Response, resp.Err = cl.client.Do(req)
+	if cl.auth != nil {
+		// if we have authentication credentials, use them
+		resp.Response, resp.Err = cl.auth.RoundTrip(req)
+	} else {
+		// otherwise issue an unauthenticated request
+		resp.Response, resp.Err = cl.client.Do(req)
+	}
+
 	if !validateStatusCode(&resp, expectedStatuses, verb, url) {
+		// if the response code is not expected, stop here
 		return
 	}
 
