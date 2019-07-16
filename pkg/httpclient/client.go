@@ -1,15 +1,52 @@
+// Package httpclient is a simple HTTP client which supports sending and receiving JSON strings using
+// GET, POST, PUT, PATCH, and DELETE requests, with configurable timeouts.
+//
+// To create a new client, you have to call the following code:
+//
+// 		client := httpclient.NewClient()
+//
+// If you want to adjust the timeouts:
+//
+//		timeouts := InitTimeouts()
+//		// adjust any timeouts here
+//		client := httpclient.NewClientWithTimeouts(timeouts)
+//
+// Then, to make a request, call one of the service methods, e.g.:
+//		resp := client.Get("http://site/path")
+//
 package httpclient
 
 import (
+	"fmt"
+	"gopkg.in/errgo.v1"
 	"io"
 	"net"
 	"net/http"
-
-	"gopkg.in/errgo.v1"
+	"runtime"
 )
 
 // ContentTypeJSON defines the JSON content type
 const ContentTypeJSON = "application/json; charset=UTF-8"
+
+// PreferJSON signal that we are accepting JSON responses, but do not reject non-JSON data
+const PreferJSON = "application/json;q=0.9, */*;q=0.8"
+
+var (
+	// userAgent holds a user agent string which will be passed along with every request
+	userAgent string
+	// the version string
+	version string
+)
+
+func init() {
+	ver := version
+	if ver == "" {
+		// if the version is not passed at build time, flag it as 'unknown'
+		ver = "unknown"
+	}
+
+	userAgent = fmt.Sprintf("pcgc/httpclient-%s (%s; %s)", ver, runtime.GOOS, runtime.GOARCH)
+}
 
 type basicHTTPClient struct {
 	client *http.Client
@@ -93,6 +130,8 @@ func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Re
 		return
 	}
 
+	req.Header.Add("Accept", PreferJSON)
+	req.Header.Add("User-Agent", userAgent)
 	if body != nil {
 		// only set the request content type if the body is non nil
 		req.Header.Add("Content-Type", ContentTypeJSON)

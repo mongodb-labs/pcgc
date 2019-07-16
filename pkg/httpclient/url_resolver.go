@@ -34,17 +34,17 @@ func NewURLResolverWithPrefix(base string, prefix string) URLResolver {
 	return result
 }
 
+// Of builds a URL by concatenating the base URL with the specified path, replacing all needed parts
+func (u baseURL) Of(apiPath string, parts ...interface{}) string {
+	result, err := u.base.Parse(fmt.Sprintf(path.Clean(apiPath), parts))
+	useful.PanicOnUnrecoverableError(err)
+	return result.String()
+}
+
 func parseBaseURL(base string) baseURL {
 	result := baseURL{}
 	var err error
 	result.base, err = url.Parse(base)
 	useful.PanicOnUnrecoverableError(err)
 	return result
-}
-
-// Of builds a URL by concatenating the base URL with the specified path, replacing all needed parts
-func (u baseURL) Of(apiPath string, parts ...interface{}) string {
-	result, err := u.base.Parse(fmt.Sprintf(path.Clean(apiPath), parts))
-	useful.PanicOnUnrecoverableError(err)
-	return result.String()
 }

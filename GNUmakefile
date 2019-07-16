@@ -44,6 +44,11 @@ clean:
 	rm -rf out
 	go clean ./...
 
+gitsha := $(shell git log -n1 --pretty='%h')
+version=$(shell git describe --exact-match --tags "$(gitsha)" 2>/dev/null)
+ifeq ($(version),)
+	version := $(gitsha)
+endif
 build: fmtcheck errcheck lint
 	mkdir -p out
-	go build ./...
+	go build -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient=$(version)"' ./...
