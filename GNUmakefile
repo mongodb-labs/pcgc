@@ -44,6 +44,9 @@ clean:
 	rm -rf out
 	go clean ./...
 
+tools:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint
+
 build: fmtcheck errcheck lint
 	mkdir -p out
-	go build ./...
+	cd pcgc && go install .
