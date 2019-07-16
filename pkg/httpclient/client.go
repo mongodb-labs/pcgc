@@ -1,4 +1,4 @@
-package pcgc
+package httpclient
 
 import (
 	"io"
@@ -8,14 +8,17 @@ import (
 	"gopkg.in/errgo.v1"
 )
 
+// ContentTypeJSON defines the JSON content type
+const ContentTypeJSON = "application/json; charset=UTF-8"
+
 type basicHTTPClient struct {
 	client *http.Client
 }
 
 // HTTPResponse wrapper for HTTP response objects
 type HTTPResponse struct {
-	resp *http.Response
-	err  error
+	Response *http.Response
+	Err      error
 }
 
 // BasicHTTPOperation defines a contract for this client's API
@@ -29,12 +32,12 @@ type BasicHTTPOperation interface {
 
 // Error implementation for error responses
 func (resp HTTPResponse) Error() string {
-	return resp.err.Error()
+	return resp.Err.Error()
 }
 
 // IsError returns true if the associated error is not nil
 func (resp HTTPResponse) IsError() bool {
-	return resp.err != nil
+	return resp.Err != nil
 }
 
 // NewClient build a new HTTP client with default timeouts
@@ -43,7 +46,7 @@ func NewClient() BasicHTTPOperation {
 }
 
 // NewClientWithTimeouts build a new HTTP client with specified timeouts
-func NewClientWithTimeouts(timeouts *HTTPClientTimeouts) BasicHTTPOperation {
+func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
 	return basicHTTPClient{client: &http.Client{
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
@@ -86,16 +89,16 @@ func (cl basicHTTPClient) Delete(url string) (resp HTTPResponse) {
 func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Reader, expectedStatuses []int) (resp HTTPResponse) {
 	req, err := http.NewRequest(verb, url, body)
 	if err != nil {
-		resp.err = err
+		resp.Err = err
 		return
 	}
 
 	if body != nil {
-		// only set the content type if the body is non nil
+		// only set the request content type if the body is non nil
 		req.Header.Add("Content-Type", ContentTypeJSON)
 	}
 
-	resp.resp, resp.err = cl.client.Do(req)
+	resp.Response, resp.Err = cl.client.Do(req)
 	if !validateStatusCode(&resp, expectedStatuses, verb, url) {
 		return
 	}
@@ -111,12 +114,12 @@ func validateStatusCode(resp *HTTPResponse, expectedStatuses []int, verb string,
 
 	// check if the resulting status is one of the expected ones
 	for _, status := range expectedStatuses {
-		if resp.resp.StatusCode == status {
+		if resp.Response.StatusCode == status {
 			return true
 		}
 	}
 
 	// otherwise augment the error and return false
-	resp.err = errgo.Notef(resp.err, "Failed to execute %s request to %s; got status code %d (%v)", verb, url, resp.resp.StatusCode, resp.resp.Status)
+	resp.Err = errgo.Notef(resp.Err, "Failed to execute %s request to %s; got status code %d (%v)", verb, url, resp.Response.StatusCode, resp.Response.Status)
 	return false
 }

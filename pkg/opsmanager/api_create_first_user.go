@@ -1,18 +1,16 @@
-package pcgc
+package opsmanager
 
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/mongodb-labs/pcgc/pkg/useful"
 )
 
-type opsManagerAPI struct {
-	BasicHTTPOperation
+// WhitelistAllowAll allows API access from any IPv4 address
+const WhitelistAllowAll = "0.0.0.1/0"
 
-	resolver URLResolver
-}
-
-// OpsManagerUser request object which identifies a user
-type OpsManagerUser struct {
+// User request object which identifies a user
+type User struct {
 	Username     string `json:"username"`
 	Password     string `json:"password,omitempty"`
 	FirstName    string `json:"firstName"`
@@ -35,7 +33,7 @@ type UserLink struct {
 
 // UserResponse wrapper for a user response, augmented with a few extra fields
 type UserResponse struct {
-	OpsManagerUser
+	User
 
 	ID    string     `json:"id"`
 	Links []UserLink `json:"links,omitempty"`
@@ -48,21 +46,9 @@ type CreateFirstUserResponse struct {
 	User   UserResponse `json:"user"`
 }
 
-// OpsManagerClient defines the API actions implemented in this client
-type OpsManagerClient interface {
-	BasicHTTPOperation
-
-	CreateFirstUser(user OpsManagerUser, whitelistIP string) (CreateFirstUserResponse, error)
-}
-
-// NewOpsManagerClient builds a new API client for connecting to Ops Manager
-func NewOpsManagerClient(resolver URLResolver) OpsManagerClient {
-	return opsManagerAPI{BasicHTTPOperation: NewClient(), resolver: resolver}
-}
-
 // CreateFirstUser registers the first ever Ops Manager user (global owner)
 // https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
-func (api opsManagerAPI) CreateFirstUser(user OpsManagerUser, whitelistIP string) (CreateFirstUserResponse, error) {
+func (api opsManagerAPI) CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error) {
 	var result CreateFirstUserResponse
 
 	bodyBytes, err := json.Marshal(user)
@@ -73,16 +59,16 @@ func (api opsManagerAPI) CreateFirstUser(user OpsManagerUser, whitelistIP string
 	url := api.resolver.Of("/unauth/users?whitelist=%s", whitelistIP)
 	resp := api.PostJSON(url, bytes.NewReader(bodyBytes))
 	if resp.IsError() {
-		return result, resp.err
+		return result, resp.Err
 	}
 
-	if resp.resp != nil && resp.resp.Body != nil {
-		defer logError(resp.resp.Body.Close)
+	if resp.Response != nil && resp.Response.Body != nil {
+		defer useful.LogError(resp.Response.Body.Close)
 	}
 
-	decoder := json.NewDecoder(resp.resp.Body)
+	decoder := json.NewDecoder(resp.Response.Body)
 	err2 := decoder.Decode(&result)
-	panicOnUnrecoverableError(err2)
+	useful.PanicOnUnrecoverableError(err2)
 
 	return result, nil
 }

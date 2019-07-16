@@ -1,7 +1,8 @@
-package pcgc
+package httpclient
 
 import (
 	"fmt"
+	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"net/url"
 	"path"
 )
@@ -28,7 +29,7 @@ func NewURLResolverWithPrefix(base string, prefix string) URLResolver {
 
 	// augment the URL with a prefix
 	result.base, err = url.Parse(prefix)
-	panicOnUnrecoverableError(err)
+	useful.PanicOnUnrecoverableError(err)
 
 	return result
 }
@@ -37,13 +38,13 @@ func parseBaseURL(base string) baseURL {
 	result := baseURL{}
 	var err error
 	result.base, err = url.Parse(base)
-	panicOnUnrecoverableError(err)
+	useful.PanicOnUnrecoverableError(err)
 	return result
 }
 
 // Of builds a URL by concatenating the base URL with the specified path, replacing all needed parts
 func (u baseURL) Of(apiPath string, parts ...interface{}) string {
 	result, err := u.base.Parse(fmt.Sprintf(path.Clean(apiPath), parts))
-	panicOnUnrecoverableError(err)
+	useful.PanicOnUnrecoverableError(err)
 	return result.String()
 }

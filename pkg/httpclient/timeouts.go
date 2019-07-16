@@ -1,9 +1,9 @@
-package pcgc
+package httpclient
 
 import "time"
 
-// HTTPClientTimeouts allows users of this code to tweak all necessary timeouts
-type HTTPClientTimeouts struct {
+// RequestTimeouts allows users of this code to tweak all necessary timeouts used during an HTTP request-response
+type RequestTimeouts struct {
 	DialTimeout           time.Duration
 	ExpectContinueTimeout time.Duration
 	IdleConnectionTimeout time.Duration
@@ -14,8 +14,8 @@ type HTTPClientTimeouts struct {
 }
 
 // InitTimeouts initializes the timeouts struct using default values
-func InitTimeouts() *HTTPClientTimeouts {
-	return &HTTPClientTimeouts{
+func InitTimeouts() *RequestTimeouts {
+	return &RequestTimeouts{
 		DialTimeout:           10 * time.Second,
 		ExpectContinueTimeout: 2 * time.Second,
 		IdleConnectionTimeout: 10 * time.Second,
