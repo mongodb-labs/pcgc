@@ -43,7 +43,7 @@ type CreateFirstUserResponse struct {
 
 // CreateFirstUser registers the first ever Ops Manager user (global owner)
 // https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
-func (api opsManagerClient) CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error) {
+func (client opsManagerClient) CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error) {
 	var result CreateFirstUserResponse
 
 	bodyBytes, err := json.Marshal(user)
@@ -51,8 +51,8 @@ func (api opsManagerClient) CreateFirstUser(user User, whitelistIP string) (Crea
 		return result, err
 	}
 
-	url := api.resolver.Of("/unauth/users?whitelist=%s", whitelistIP)
-	resp := api.PostJSON(url, bytes.NewReader(bodyBytes))
+	url := client.resolver.Of("/unauth/users?whitelist=%s", whitelistIP)
+	resp := client.PostJSON(url, bytes.NewReader(bodyBytes))
 	if resp.IsError() {
 		return result, resp.Err
 	}

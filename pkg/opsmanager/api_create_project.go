@@ -6,6 +6,6 @@ import (
 
 // CreateOneProject
 // https://docs.opsmanager.mongodb.com/master/reference/api/groups/create-one-group/
-func (api opsManagerClient) CreateOneProject(name string, orgID string) (interface{}, error) {
+func (client opsManagerClient) CreateOneProject(name string, orgID string) (interface{}, error) {
 	return nil, errors.New("not implemented yet")
 }

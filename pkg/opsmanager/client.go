@@ -96,7 +96,7 @@ func NewClient(configs ...func(*opsManagerClient)) Client {
 		useful.PanicOnUnrecoverableError(errors.New("the client requires an underlying basic HTTP client to be configured"))
 	}
 
-	return *client
+	return client
 }
 
 // WithResolver configures an Ops Manager client which relies on the specified resolver
@@ -107,8 +107,8 @@ func WithResolver(resolver httpclient.URLResolver) func(*opsManagerClient) {
 }
 
 // WithHTTPClient configures an Ops Manager which delegates basic HTTP operations to the specified client
-func WithHTTPClient(client httpclient.BasicClient) func(*opsManagerClient) {
+func WithHTTPClient(basicClient httpclient.BasicClient) func(*opsManagerClient) {
 	return func(client *opsManagerClient) {
-		client.BasicClient = client
+		client.BasicClient = basicClient
 	}
 }
