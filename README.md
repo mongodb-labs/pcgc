@@ -11,20 +11,29 @@ This library is licensed under the terms of the [Apache License, Version 2.0](ht
 
 ### Desired feature set for release v0.1.0
 
-- [ ] Register the first user
+- [x] Register the first user
   - send the IP whitelist
-  - return: `groupId`, `publicApiKey`
+  - return: `publicApiKey`
 
-- [ ] Implement digest authentication (not available in Go's http client), see: 
-  - https://godoc.org/github.com/bobziuchkovski/digest
-  - https://en.wikipedia.org/wiki/Digest_access_authentication
+- [x] Implement digest authentication (not available in Go's http client) 
+
+- [ ] Create a project
+  - https://docs.opsmanager.mongodb.com/master/reference/api/groups/create-one-group/
+  - return: `groupId`
 
 - [ ] Create an agent API key
+  https://docs.opsmanager.mongodb.com/master/reference/api/agentapikeys/create-one-agent-api-key/
   - return: `mmsApiKey`
 
 - [ ] Retrieve the monitoring version from the automation config
+  https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#get-the-automation-configuration
+  `{"automationAgentVersion":"5.8.0.5546-1","monitoringAgentVersion":"6.7.0.466-1","biConnectorVersion":"2.6.1","backupAgentVersion":"7.1.0.1011-1"}`
 
-- [ ] Patch the automation config: enable monitoring
+- [ ] Get all hosts in a Project
+  https://docs.opsmanager.mongodb.com/current/reference/api/hosts/get-all-hosts-in-group/
+
+- [ ] Update the automation config: enable monitoring
+  https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration
   ```json
     {
         "monitoringVersions": [{

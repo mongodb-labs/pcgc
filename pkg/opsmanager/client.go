@@ -28,6 +28,7 @@ package opsmanager
 
 import (
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
+	"io"
 )
 
 type opsManagerAPI struct {
@@ -40,8 +41,27 @@ type opsManagerAPI struct {
 type Client interface {
 	httpclient.BasicHTTPOperation
 
+	// https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
 	CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/get-all-groups-for-current-user/
 	GetAllProjects() (Projects, error)
+
+	// Method contracts: will be implemented later
+
+	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/create-one-group/
+	CreateOneProject(name string, orgID string) (interface{}, error)
+
+	// https://docs.opsmanager.mongodb.com/master/reference/api/agentapikeys/create-one-agent-api-key/
+	CreateAgentAPIKEY(projectID string, name string) (interface{}, error)
+
+	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#get-the-automation-configuration
+	GetAutomationConfig(projectID string) (interface{}, error)
+
+	// https://docs.opsmanager.mongodb.com/current/reference/api/hosts/get-all-hosts-in-group/
+	GetAllHostsInProject(projectID string, pageNum int, itemsPerPage int) (interface{}, error)
+
+	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration
+	UpdateAutomationConfig(projectID string, body io.Reader) (interface{}, error)
 }
 
 // NewClient builds a new API client for connecting to Ops Manager
