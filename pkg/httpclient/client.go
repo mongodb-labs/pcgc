@@ -28,6 +28,7 @@
 package httpclient
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"gopkg.in/errgo.v1"
@@ -35,6 +36,7 @@ import (
 	"net"
 	"net/http"
 	"runtime"
+	"strings"
 
 	"github.com/Sectorbob/mlab-ns2/gae/ns/digest"
 )
@@ -202,7 +204,20 @@ func validateStatusCode(resp *HTTPResponse, expectedStatuses []int, verb string,
 		}
 	}
 
+	// parse response body
+	defer CloseResponseBodyIfNotNil(*resp)
+	var errorDetails interface{}
+	decoder := json.NewDecoder(resp.Response.Body)
+	err := decoder.Decode(&errorDetails)
+	useful.PanicOnUnrecoverableError(err)
+
 	// otherwise augment the error and return false
-	resp.Err = errgo.Notef(resp.Err, "Failed to execute %s request to %s; got status code %d (%v)", verb, url, resp.Response.StatusCode, resp.Response.Status)
+	sb := strings.Builder{}
+	sb.WriteString(fmt.Sprintf("failed to execute %s request to %s\n", verb, url))
+	sb.WriteString(fmt.Sprintf("status code: %d\n", resp.Response.StatusCode))
+	sb.WriteString(fmt.Sprintf("response: %s\n", resp.Response.Status))
+	sb.WriteString(fmt.Sprintf("details: %s\n", errorDetails))
+	resp.Err = errgo.Notef(resp.Err, sb.String())
+
 	return false
 }
