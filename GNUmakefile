@@ -57,11 +57,15 @@ endif
 build: fmtcheck errcheck lint test
 	@echo "==> Building binary for the current architecture..."
 	mkdir -p out
-	go build -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)"' -o out/pcgc
+	go build -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)" -X "github.com/mongodb-labs/pcgc/pkg/mpc/cmd/root.version=$(version)"' -o out/pcgc
 
 install: fmtcheck errcheck lint test
 	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
-	go install -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)"' .
+	go install -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)" -X "github.com/mongodb-labs/pcgc/pkg/mpc/cmd/root.version=$(version)"' .
+
+installmpc: fmtcheck errcheck lint test
+	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
+	cd pkg/mpc && go install -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)" -X "github.com/mongodb-labs/pcgc/pkg/mpc/cmd/root.version=$(version)"' .
 
 # GIT hooks
 link-git-hooks:

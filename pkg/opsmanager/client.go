@@ -2,7 +2,7 @@
 //
 // To create a new client, you have to call the following code:
 //
-//		resolver := httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", "/api/public/v1.0")
+//		resolver := httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", opsmanager.PublicApiPrefix)
 // 		client := opsmanager.NewClient(resolver)
 //
 // The client can then be used to issue requests such as:
@@ -53,7 +53,7 @@ type Client interface {
 	// https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
 	CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/get-all-groups-for-current-user/
-	GetAllProjects() (Projects, error)
+	GetAllProjects() (ProjectsResponse, error)
 
 	// Method contracts: will be implemented later
 

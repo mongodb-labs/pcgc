@@ -1,18 +1,22 @@
 package cmd
 
 import (
+	"log"
+	"os"
+
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
-	"os"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	version string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Version: "0.0.1",
+	Version: version,
 	Use:     "mpc",
 	Short:   "MPC cli tool to manage your mongo cloud",
 	Long:    "Use mpc command help for information on a  specific  command.",
@@ -22,7 +26,7 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Fatal(err)
+		er(err)
 	}
 }
 
@@ -49,11 +53,11 @@ func initConfig() {
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
-			log.Fatal(err)
+			er(err)
 		}
 		_, err2 := os.OpenFile(home+"/.mpc.json", os.O_RDONLY|os.O_CREATE, 0600)
 		if err2 != nil {
-			log.Fatal(err)
+			er(err)
 		}
 
 		viper.SetConfigType("json")

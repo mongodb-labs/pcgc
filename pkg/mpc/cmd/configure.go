@@ -3,7 +3,6 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"syscall"
@@ -26,22 +25,22 @@ var configureCmd = &cobra.Command{
 
 		viper.Set("baseURL", strings.TrimSpace(baseURL))
 
-		fmt.Print("Enter Username: ")
+		fmt.Print("Enter Public Key: ")
 		username, _ := reader.ReadString('\n')
 
 		viper.Set("username", strings.TrimSpace(username))
 
-		fmt.Print("Enter Password: ")
+		fmt.Print("Enter Private Key: ")
 		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 		if err != nil {
-			log.Fatal(err)
+			er(err)
 		}
 		password := string(bytePassword)
 		viper.Set("password", strings.TrimSpace(password))
 
 		err = viper.WriteConfig()
 		if err != nil {
-			log.Fatal(err)
+			er(err)
 		}
 
 		fmt.Println("\nDone!")
