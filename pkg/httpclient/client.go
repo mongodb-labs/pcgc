@@ -12,7 +12,7 @@
 //		client := httpclient.NewClientWithTimeouts(timeouts)
 //
 // Then, to make a request, call one of the service methods, e.g.:
-//		resp := client.Get("http://site/path")
+//		resp := client.GetJSON("http://site/path")
 //
 // Once you have an user and a corresponding public API key, you can issue authenticated requests,
 // by constructing a new client with the appropriate credentials:
@@ -69,7 +69,7 @@ type HTTPResponse struct {
 
 // BasicHTTPOperation defines a contract for this client's API
 type BasicHTTPOperation interface {
-	Get(url string) HTTPResponse
+	GetJSON(url string) HTTPResponse
 	PostJSON(url string, body io.Reader) HTTPResponse
 	PatchJSON(url string, body io.Reader) HTTPResponse
 	PutJSON(url string, body io.Reader) HTTPResponse
@@ -114,8 +114,8 @@ func NewClientWithAuthentication(user string, publicAPIToken string) BasicHTTPOp
 	return client
 }
 
-// Get retrieves the specified URL
-func (cl basicHTTPClient) Get(url string) HTTPResponse {
+// GetJSON retrieves the specified URL
+func (cl basicHTTPClient) GetJSON(url string) HTTPResponse {
 	return cl.genericJSONRequest("GET", url, nil, []int{http.StatusOK})
 }
 

@@ -54,7 +54,7 @@ func (api opsManagerAPI) GetAllProjects() (Projects, error) {
 	var result Projects
 
 	url := api.resolver.Of("/groups")
-	resp := api.Get(url)
+	resp := api.GetJSON(url)
 	if resp.IsError() {
 		return result, resp.Err
 	}

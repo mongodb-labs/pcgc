@@ -15,7 +15,7 @@
 // _httpclient.BasicHTTPOperation_, allowing you to issue raw HTTP requests to the specified Ops Manager instance.
 //
 // 		url := resolver.Of("/path/to/a/resource/%s", id)
-//		resp:= client.Get(url)
+//		resp:= client.GetJSON(url)
 //		useful.PanicOnUnrecoverableError(resp.Err)
 //		defer useful.LogError(resp.Response.Body.Close)
 //		var data SomeType
