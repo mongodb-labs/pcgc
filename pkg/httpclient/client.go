@@ -7,7 +7,7 @@
 //
 // If you want to adjust the timeouts:
 //
-//		timeouts := InitTimeouts()
+//		timeouts := InitDefaultTimeouts()
 //		// adjust any timeouts here
 //		client := httpclient.NewClientWithTimeouts(timeouts)
 //
@@ -65,8 +65,9 @@ func init() {
 }
 
 type basicHTTPClient struct {
-	client *http.Client
-	auth   *digest.Transport
+	client                    *http.Client
+	auth                      *digest.Transport
+	listOfAcceptedStatusCodes []int
 }
 
 // HTTPResponse wrapper for HTTP response objects
@@ -94,15 +95,43 @@ func (resp HTTPResponse) IsError() bool {
 	return resp.Err != nil
 }
 
-// NewClient builds a new HTTP client with default timeouts
-func NewClient() BasicHTTPOperation {
-	return NewClientWithTimeouts(InitTimeouts())
+// NewClient builds a new client, allowing for dynamic configuration
+// the order of the passed function matters, as they will be applied sequentially
+func NewClient(configs ...func(*basicHTTPClient)) BasicHTTPOperation {
+	// initialize a bare client
+	client := &basicHTTPClient{client: &http.Client{}}
+
+	// configure defaults
+	WithDefaultTimeouts()(client)
+	WithAcceptedStatusCodes([]int{http.StatusOK, http.StatusCreated})(client)
+
+	// apply any other configurations
+	for _, configure := range configs {
+		configure(client)
+	}
+	return *client
 }
 
-// NewClientWithTimeouts builds a new HTTP client with specified timeouts
-func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
-	return basicHTTPClient{client: &http.Client{
-		Transport: &http.Transport{
+// WithDefaultTimeouts configures a client with default timeouts
+func WithDefaultTimeouts() func(*basicHTTPClient) {
+	return WithTimeouts(NewDefaultTimeouts())
+}
+
+// WithAcceptedStatusCodes configures a client with a list of accepted HTTP response status codes
+func WithAcceptedStatusCodes(acceptedStatusCodes []int) func(*basicHTTPClient) {
+	return func(client *basicHTTPClient) {
+		client.listOfAcceptedStatusCodes = acceptedStatusCodes
+	}
+}
+
+// WithTimeouts configures a client with the specified timeouts
+func WithTimeouts(timeouts *RequestTimeouts) func(*basicHTTPClient) {
+	return func(client *basicHTTPClient) {
+		// set global (total) timeout
+		client.client.Timeout = timeouts.GlobalTimeout
+
+		// set all other timeouts
+		client.client.Transport = &http.Transport{
 			DialContext: (&net.Dialer{
 				Timeout: timeouts.DialTimeout,
 			}).DialContext,
@@ -110,41 +139,40 @@ func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
 			IdleConnTimeout:       timeouts.IdleConnectionTimeout,
 			ResponseHeaderTimeout: timeouts.ResponseHeaderTimeout,
 			TLSHandshakeTimeout:   timeouts.TLSHandshakeTimeout,
-		},
-		Timeout: timeouts.GlobalTimeout,
-	}}
+		}
+	}
 }
 
-// NewClientWithAuthentication builds a new client which can use Digest authentication to make authenticated calls
-func NewClientWithAuthentication(username string, password string) BasicHTTPOperation {
-	client := NewClientWithTimeouts(InitTimeouts()).(basicHTTPClient)
-	client.auth = digest.NewTransport(username, password)
-	return client
+// WithDigestAuthentication configures a client with digest authentication credentials
+func WithDigestAuthentication(username string, password string) func(*basicHTTPClient) {
+	return func(client *basicHTTPClient) {
+		client.auth = digest.NewTransport(username, password)
+	}
 }
 
 // GetJSON retrieves the specified URL
 func (cl basicHTTPClient) GetJSON(url string) HTTPResponse {
-	return cl.genericJSONRequest(http.MethodGet, url, nil, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodGet, url, nil)
 }
 
 // PostJson executes a POST request, sending the specified body, encoded as JSON, to the passed URL
 func (cl basicHTTPClient) PostJSON(url string, body io.Reader) HTTPResponse {
-	return cl.genericJSONRequest(http.MethodPost, url, body, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodPost, url, body)
 }
 
 // PutJSON executes a PUT request, sending the specified body, encoded as JSON, to the passed URL
 func (cl basicHTTPClient) PutJSON(url string, body io.Reader) (resp HTTPResponse) {
-	return cl.genericJSONRequest(http.MethodPut, url, body, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodPut, url, body)
 }
 
 // PatchJSON executes a PATCH request, sending the specified body, encoded as JSON, to the passed URL
 func (cl basicHTTPClient) PatchJSON(url string, body io.Reader) (resp HTTPResponse) {
-	return cl.genericJSONRequest(http.MethodPatch, url, body, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodPatch, url, body)
 }
 
 // Delete executes a DELETE request
 func (cl basicHTTPClient) Delete(url string) (resp HTTPResponse) {
-	return cl.genericJSONRequest(http.MethodDelete, url, nil, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodDelete, url, nil)
 }
 
 // CloseResponseBodyIfNotNil simple helper which can ensure a response's body is correctly closed, if one exists
@@ -161,7 +189,7 @@ func CloseResponseBodyIfNotNil(resp HTTPResponse) {
 	useful.LogError(resp.Response.Body.Close)
 }
 
-func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Reader, expectedStatuses []int) (resp HTTPResponse) {
+func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Reader) (resp HTTPResponse) {
 	req, err := http.NewRequest(verb, url, body)
 	if err != nil {
 		resp.Err = err
@@ -183,7 +211,7 @@ func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Re
 		resp.Response, resp.Err = cl.client.Do(req)
 	}
 
-	if !validateStatusCode(&resp, expectedStatuses, verb, url) {
+	if !validateStatusCode(&resp, cl.listOfAcceptedStatusCodes, verb, url) {
 		// if the response code is not expected, stop here
 		return
 	}

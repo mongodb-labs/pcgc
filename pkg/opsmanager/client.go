@@ -80,5 +80,8 @@ func NewClient(resolver httpclient.URLResolver) Client {
 
 // NewClientWithAuthentication builds a new API client for connecting to Ops Manager
 func NewClientWithAuthentication(resolver httpclient.URLResolver, publicKey string, privateKey string) Client {
-	return opsManagerAPI{BasicHTTPOperation: httpclient.NewClientWithAuthentication(publicKey, privateKey), resolver: resolver}
+	client := httpclient.NewClient(
+		httpclient.WithDigestAuthentication(publicKey, privateKey),
+	)
+	return opsManagerAPI{BasicHTTPOperation: client, resolver: resolver}
 }
