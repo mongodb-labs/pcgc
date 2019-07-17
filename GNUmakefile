@@ -54,18 +54,15 @@ version=$(shell git describe --exact-match --tags "$(gitsha)" 2>/dev/null)
 ifeq ($(version),)
 	version := $(gitsha)
 endif
+ldflags=-ldflags='-X github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version) -X github.com/mongodb-labs/pcgc/pkg/mpc/cmd.version=$(version)'
 build: fmtcheck errcheck lint test
 	@echo "==> Building binary for the current architecture..."
 	mkdir -p out
-	go build -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)" -X "github.com/mongodb-labs/pcgc/pkg/mpc/cmd/root.version=$(version)"' -o out/pcgc
+	go build $(ldflags) -o out/pcgc
 
 install: fmtcheck errcheck lint test
 	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
-	go install -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)" -X "github.com/mongodb-labs/pcgc/pkg/mpc/cmd/root.version=$(version)"' .
-
-installmpc: fmtcheck errcheck lint test
-	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
-	cd pkg/mpc && go install -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)" -X "github.com/mongodb-labs/pcgc/pkg/mpc/cmd/root.version=$(version)"' .
+	go install $(ldflags) ./pkg/mpc
 
 # GIT hooks
 link-git-hooks:
