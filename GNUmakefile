@@ -4,6 +4,7 @@ GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 default: build
 
 test: fmtcheck
+	@echo "==> Running tests..."
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | \
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
@@ -27,6 +28,7 @@ errcheck:
 	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
 
 lint:
+	@echo "==> Linting all packages..."
 	golint -set_exit_status ./...
 	GOGC=30 golangci-lint run ./...
 
@@ -36,11 +38,13 @@ test-compile:
 		echo "  make test-compile TEST=./package-name"; \
 		exit 1; \
 	fi
+	@echo "==> Compiling test binary..."
 	go test -c $(TEST) $(TESTARGS)
 
 .PHONY: build test testacc vet fmt fmtcheck errcheck lint test-compile
 
 clean:
+	@echo "==> Cleaning build artifacts..."
 	rm -rf out
 	go clean ./...
 
@@ -49,6 +53,7 @@ version=$(shell git describe --exact-match --tags "$(gitsha)" 2>/dev/null)
 ifeq ($(version),)
 	version := $(gitsha)
 endif
-build: fmtcheck errcheck lint
+build: fmtcheck errcheck lint test
+	@echo "==> Building binary for the current architecture..."
 	mkdir -p out
-	go build -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient=$(version)"' ./...
+	go build -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient=$(version)"' -o out/pcgc

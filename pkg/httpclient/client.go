@@ -30,7 +30,7 @@ import (
 	"net/http"
 	"runtime"
 
-	digest "github.com/Sectorbob/mlab-ns2/gae/ns/digest"
+	"github.com/Sectorbob/mlab-ns2/gae/ns/digest"
 )
 
 // ContentTypeJSON defines the JSON content type

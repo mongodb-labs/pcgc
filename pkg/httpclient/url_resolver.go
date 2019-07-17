@@ -8,7 +8,8 @@ import (
 )
 
 type baseURL struct {
-	base *url.URL
+	base   *url.URL
+	prefix string
 }
 
 // URLResolver contract for resolving any paths against the given base URL
@@ -23,20 +24,20 @@ func NewURLResolver(base string) URLResolver {
 
 // NewURLResolverWithPrefix builds a new API URL using a prefix for all other paths
 func NewURLResolverWithPrefix(base string, prefix string) URLResolver {
-	var err error
-
 	result := parseBaseURL(base)
-
-	// augment the URL with a prefix
-	result.base, err = url.Parse(prefix)
-	useful.PanicOnUnrecoverableError(err)
-
+	result.prefix = prefix
 	return result
 }
 
-// Of builds a URL by concatenating the base URL with the specified path, replacing all needed parts
-func (u baseURL) Of(apiPath string, parts ...interface{}) string {
-	result, err := u.base.Parse(fmt.Sprintf(path.Clean(apiPath), parts))
+// Of builds a URL by concatenating the base URL with the specified path, replacing all expansions
+func (u baseURL) Of(apiPath string, expansions ...interface{}) string {
+	expandedPath := fmt.Sprintf(apiPath, expansions...)
+	if u.prefix != "" {
+		// add the prefix, if required
+		expandedPath = path.Join(u.prefix, expandedPath)
+	}
+
+	result, err := u.base.Parse(path.Clean(expandedPath))
 	useful.PanicOnUnrecoverableError(err)
 	return result.String()
 }
