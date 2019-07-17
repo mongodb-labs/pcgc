@@ -56,9 +56,10 @@ ifeq ($(version),)
 endif
 ldflags=-ldflags='-X github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version) -X github.com/mongodb-labs/pcgc/pkg/mpc/cmd.version=$(version)'
 build: fmtcheck errcheck lint test
-	@echo "==> Building binary for the current architecture..."
+	@echo "==> Building binaries for the current architecture..."
 	mkdir -p out
-	go build $(ldflags) -o out/pcgc
+	go build $(ldflags) ./...
+	go build $(ldflags) -o out/mpc ./pkg/mpc
 
 install: fmtcheck errcheck lint test
 	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
