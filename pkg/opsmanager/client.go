@@ -3,7 +3,7 @@
 // To create a new client, you have to call the following code:
 //
 //		resolver := httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", opsmanager.PublicApiPrefix)
-// 		client := opsmanager.NewClient(resolver)
+// 		client := opsmanager.NewClient(WithResolver(resolver))
 //
 // The client can then be used to issue requests such as:
 //
@@ -25,7 +25,10 @@
 //		// do something with _data_
 //
 // To issue authenticated requests, initialize a client using:
-//		client := opsmanager.NewClientWithAuthentication(publicKey, privateKey)
+//		withResolver := opsmanager.WithResolver(httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", PublicAPIPrefix))
+//		withDigestAuth := httpclient.WithDigestAuthentication(publicKey, privateKey)
+//		withHTTPClient := opsmanager.WithHTTPClient(httpclient.NewClient(withDigestAuth))
+//		client := opsmanager.NewClient(withResolver, withHTTPClient)
 //
 // The following credential pairs can be used for authentication:
 //		- Ops Manager user credentials: (username, password)
@@ -37,6 +40,8 @@ package opsmanager
 
 import (
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
+	"github.com/mongodb-labs/pcgc/pkg/useful"
+	"github.com/pkg/errors"
 	"io"
 )
 
@@ -74,14 +79,36 @@ type Client interface {
 }
 
 // NewClient builds a new API client for connecting to Ops Manager
-func NewClient(resolver httpclient.URLResolver) Client {
-	return opsManagerAPI{BasicHTTPOperation: httpclient.NewClient(), resolver: resolver}
+func NewClient(configs ...func(*opsManagerAPI)) Client {
+	// initialize a bare client
+	client := &opsManagerAPI{}
+
+	// apply all configurations
+	for _, configure := range configs {
+		configure(client)
+	}
+
+	// validations
+	if client.resolver == nil {
+		useful.PanicOnUnrecoverableError(errors.New("the client requires a URLResolver with the appropriate Ops Manager URL configured"))
+	}
+	if client.BasicHTTPOperation == nil {
+		useful.PanicOnUnrecoverableError(errors.New("the client requires an underlying basic HTTP client to be configured"))
+	}
+
+	return *client
 }
 
-// NewClientWithAuthentication builds a new API client for connecting to Ops Manager
-func NewClientWithAuthentication(resolver httpclient.URLResolver, publicKey string, privateKey string) Client {
-	client := httpclient.NewClient(
-		httpclient.WithDigestAuthentication(publicKey, privateKey),
-	)
-	return opsManagerAPI{BasicHTTPOperation: client, resolver: resolver}
+// WithResolver configures an Ops Manager client which relies on the specified resolver
+func WithResolver(resolver httpclient.URLResolver) func(*opsManagerAPI) {
+	return func(api *opsManagerAPI) {
+		api.resolver = resolver
+	}
+}
+
+// WithHTTPClient configures an Ops Manager which delegates basic HTTP operations to the specified client
+func WithHTTPClient(client httpclient.BasicHTTPOperation) func(*opsManagerAPI) {
+	return func(api *opsManagerAPI) {
+		api.BasicHTTPOperation = client
+	}
 }

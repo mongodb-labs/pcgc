@@ -109,6 +109,7 @@ func NewClient(configs ...func(*basicHTTPClient)) BasicHTTPOperation {
 	for _, configure := range configs {
 		configure(client)
 	}
+
 	return *client
 }
 
