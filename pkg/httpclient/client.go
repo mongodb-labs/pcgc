@@ -124,27 +124,27 @@ func NewClientWithAuthentication(username string, password string) BasicHTTPOper
 
 // GetJSON retrieves the specified URL
 func (cl basicHTTPClient) GetJSON(url string) HTTPResponse {
-	return cl.genericJSONRequest("GET", url, nil, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodGet, url, nil, []int{http.StatusOK})
 }
 
 // PostJson executes a POST request, sending the specified body, encoded as JSON, to the passed URL
 func (cl basicHTTPClient) PostJSON(url string, body io.Reader) HTTPResponse {
-	return cl.genericJSONRequest("POST", url, body, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodPost, url, body, []int{http.StatusOK})
 }
 
 // PutJSON executes a PUT request, sending the specified body, encoded as JSON, to the passed URL
 func (cl basicHTTPClient) PutJSON(url string, body io.Reader) (resp HTTPResponse) {
-	return cl.genericJSONRequest("PUT", url, body, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodPut, url, body, []int{http.StatusOK})
 }
 
 // PatchJSON executes a PATCH request, sending the specified body, encoded as JSON, to the passed URL
 func (cl basicHTTPClient) PatchJSON(url string, body io.Reader) (resp HTTPResponse) {
-	return cl.genericJSONRequest("PATCH", url, body, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodPatch, url, body, []int{http.StatusOK})
 }
 
 // Delete executes a DELETE request
 func (cl basicHTTPClient) Delete(url string) (resp HTTPResponse) {
-	return cl.genericJSONRequest("DELETE", url, nil, []int{http.StatusOK})
+	return cl.genericJSONRequest(http.MethodDelete, url, nil, []int{http.StatusOK})
 }
 
 // CloseResponseBodyIfNotNil simple helper which can ensure a response's body is correctly closed, if one exists
