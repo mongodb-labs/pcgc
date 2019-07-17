@@ -24,6 +24,16 @@
 //		useful.PanicOnUnrecoverableError(err)
 //		// do something with _data_
 //
+// To issue authenticated requests, initialize a client using:
+//		client := opsmanager.NewClientWithAuthentication(publicKey, privateKey)
+//
+// The following credential pairs can be used for authentication:
+//		- Ops Manager user credentials: (username, password)
+//		- Programmatic API keys: (publicKey, privateKey)
+//		- Ops Manager user and a Personal API Key (deprecated): (username, personalAPIKey)
+// You can read more about this topic here: https://docs.opsmanager.mongodb.com/master/tutorial/configure-public-api-access/#configure-public-api-access
+//
+
 package opsmanager
 
 import (
@@ -67,4 +77,9 @@ type Client interface {
 // NewClient builds a new API client for connecting to Ops Manager
 func NewClient(resolver httpclient.URLResolver) Client {
 	return opsManagerAPI{BasicHTTPOperation: httpclient.NewClient(), resolver: resolver}
+}
+
+// NewClientWithAuthentication builds a new API client for connecting to Ops Manager
+func NewClientWithAuthentication(resolver httpclient.URLResolver, publicKey string, privateKey string) Client {
+	return opsManagerAPI{BasicHTTPOperation: httpclient.NewClientWithAuthentication(publicKey, privateKey), resolver: resolver}
 }

@@ -17,7 +17,13 @@
 // Once you have an user and a corresponding public API key, you can issue authenticated requests,
 // by constructing a new client with the appropriate credentials:
 //
-//		client := httpclient.NewClientWithAuthentication(username, publicAPIToken)
+//		client := httpclient.NewClientWithAuthentication(username, password)
+//
+// The following can be used for authentication:
+//		- Ops Manager user credentials: (username, password)
+//		- Programmatic API keys: (publicKey, privateKey)
+//		- Ops Manager user and a Personal API Key (deprecated): (username, personalAPIKey)
+// You can read more about this topic here: https://docs.opsmanager.mongodb.com/master/tutorial/configure-public-api-access/#configure-public-api-access
 //
 package httpclient
 
@@ -26,6 +32,7 @@ import (
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"gopkg.in/errgo.v1"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"runtime"
@@ -54,6 +61,7 @@ func init() {
 	}
 
 	userAgent = fmt.Sprintf("pcgc/httpclient-%s (%s; %s)", ver, runtime.GOOS, runtime.GOARCH)
+	log.Printf("User agent init=%s", userAgent)
 }
 
 type basicHTTPClient struct {
@@ -108,9 +116,9 @@ func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
 }
 
 // NewClientWithAuthentication builds a new client which can use Digest authentication to make authenticated calls
-func NewClientWithAuthentication(user string, publicAPIToken string) BasicHTTPOperation {
+func NewClientWithAuthentication(username string, password string) BasicHTTPOperation {
 	client := NewClientWithTimeouts(InitTimeouts()).(basicHTTPClient)
-	client.auth = digest.NewTransport(user, publicAPIToken)
+	client.auth = digest.NewTransport(username, password)
 	return client
 }
 
