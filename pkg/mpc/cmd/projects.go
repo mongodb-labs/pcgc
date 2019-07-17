@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
 	"github.com/mongodb-labs/pcgc/pkg/opsmanager"
-	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -24,8 +23,10 @@ var listCmd = &cobra.Command{
 	Short: "List projects",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		resolver := httpclient.NewURLResolverWithPrefix(viper.GetString("baseURL"), opsmanager.PublicAPIPrefix)
-		client := opsmanager.NewClientWithAuthentication(resolver, viper.GetString("username"), viper.GetString("password"))
+		withResolver := opsmanager.WithResolver(httpclient.NewURLResolverWithPrefix(viper.GetString("baseURL"), opsmanager.PublicAPIPrefix))
+		withDigestAuth := httpclient.WithDigestAuthentication(viper.GetString("username"), viper.GetString("password"))
+		withHTTPClient := opsmanager.WithHTTPClient(httpclient.NewClient(withDigestAuth))
+		client := opsmanager.NewClient(withResolver, withHTTPClient)
 		projects, err := client.GetAllProjects()
 
 		if err != nil {

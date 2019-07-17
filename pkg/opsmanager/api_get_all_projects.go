@@ -49,11 +49,11 @@ type Result struct {
 
 // GetAllProjects registers the first ever Ops Manager user (global owner)
 // https://docs.opsmanager.mongodb.com/master/reference/api/groups/get-all-groups-for-current-user/
-func (api opsManagerAPI) GetAllProjects() (ProjectsResponse, error) {
+func (client opsManagerClient) GetAllProjects() (ProjectsResponse, error) {
 	var result ProjectsResponse
 
-	url := api.resolver.Of("/groups")
-	resp := api.GetJSON(url)
+	url := client.resolver.Of("/groups")
+	resp := client.GetJSON(url)
 	if resp.IsError() {
 		return result, resp.Err
 	}

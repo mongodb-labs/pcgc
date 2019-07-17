@@ -1,9 +1,9 @@
-// Package opsmanager is a HTTP client which abstracts communication with an Ops Manager instance.
+// Package opsmanager hosts a HTTP client which abstracts communication with Ops Manager instances.
 //
 // To create a new client, you have to call the following code:
 //
 //		resolver := httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", opsmanager.PublicApiPrefix)
-// 		client := opsmanager.NewClient(resolver)
+// 		client := opsmanager.NewClient(WithResolver(resolver))
 //
 // The client can then be used to issue requests such as:
 //
@@ -25,30 +25,35 @@
 //		// do something with _data_
 //
 // To issue authenticated requests, initialize a client using:
-//		client := opsmanager.NewClientWithAuthentication(publicKey, privateKey)
+//		withResolver := opsmanager.WithResolver(httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", PublicAPIPrefix))
+//		withDigestAuth := httpclient.WithDigestAuthentication(publicKey, privateKey)
+//		withHTTPClient := opsmanager.WithHTTPClient(httpclient.NewClient(withDigestAuth))
+//		client := opsmanager.NewClient(withResolver, withHTTPClient)
 //
-// The following credential pairs can be used for authentication:
-//		- Ops Manager user credentials: (username, password)
-//		- Programmatic API keys: (publicKey, privateKey)
-//		- Ops Manager user and a Personal API Key (deprecated): (username, personalAPIKey)
+// The following can be used for authentication:
+//		- Ops Manager user credentials: (username, password) - only works with some APIs and should not be used
+//		- Programmatic API keys: (publicKey, privateKey) - preferred credentials pair
+//		- Ops Manager user and a Personal API Key: (username, personalAPIKey) - deprecated
 // You can read more about this topic here: https://docs.opsmanager.mongodb.com/master/tutorial/configure-public-api-access/#configure-public-api-access
 //
 package opsmanager
 
 import (
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
+	"github.com/mongodb-labs/pcgc/pkg/useful"
+	"github.com/pkg/errors"
 	"io"
 )
 
-type opsManagerAPI struct {
-	httpclient.BasicHTTPOperation
+type opsManagerClient struct {
+	httpclient.BasicClient
 
 	resolver httpclient.URLResolver
 }
 
 // Client defines the API actions implemented in this client
 type Client interface {
-	httpclient.BasicHTTPOperation
+	httpclient.BasicClient
 
 	// https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
 	CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error)
@@ -74,11 +79,36 @@ type Client interface {
 }
 
 // NewClient builds a new API client for connecting to Ops Manager
-func NewClient(resolver httpclient.URLResolver) Client {
-	return opsManagerAPI{BasicHTTPOperation: httpclient.NewClient(), resolver: resolver}
+func NewClient(configs ...func(*opsManagerClient)) Client {
+	// initialize a bare client
+	client := &opsManagerClient{}
+
+	// apply all configurations
+	for _, configure := range configs {
+		configure(client)
+	}
+
+	// validations
+	if client.resolver == nil {
+		useful.PanicOnUnrecoverableError(errors.New("the client requires a URLResolver with the appropriate Ops Manager URL configured"))
+	}
+	if client.BasicClient == nil {
+		useful.PanicOnUnrecoverableError(errors.New("the client requires an underlying basic HTTP client to be configured"))
+	}
+
+	return client
 }
 
-// NewClientWithAuthentication builds a new API client for connecting to Ops Manager
-func NewClientWithAuthentication(resolver httpclient.URLResolver, publicKey string, privateKey string) Client {
-	return opsManagerAPI{BasicHTTPOperation: httpclient.NewClientWithAuthentication(publicKey, privateKey), resolver: resolver}
+// WithResolver configures an Ops Manager client which relies on the specified resolver
+func WithResolver(resolver httpclient.URLResolver) func(*opsManagerClient) {
+	return func(client *opsManagerClient) {
+		client.resolver = resolver
+	}
+}
+
+// WithHTTPClient configures an Ops Manager which delegates basic HTTP operations to the specified client
+func WithHTTPClient(basicClient httpclient.BasicClient) func(*opsManagerClient) {
+	return func(client *opsManagerClient) {
+		client.BasicClient = basicClient
+	}
 }

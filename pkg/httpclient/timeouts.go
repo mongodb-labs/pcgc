@@ -13,8 +13,8 @@ type RequestTimeouts struct {
 	GlobalTimeout time.Duration
 }
 
-// InitTimeouts initializes the timeouts struct using default values
-func InitTimeouts() *RequestTimeouts {
+// NewDefaultTimeouts initializes the timeouts struct using default values
+func NewDefaultTimeouts() *RequestTimeouts {
 	return &RequestTimeouts{
 		DialTimeout:           10 * time.Second,
 		ExpectContinueTimeout: 2 * time.Second,

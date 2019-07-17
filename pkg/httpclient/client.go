@@ -1,4 +1,4 @@
-// Package httpclient is a simple HTTP client which supports sending and receiving JSON strings using
+// Package httpclient hosts a simple HTTP client which supports sending and receiving JSON data using
 // GET, POST, PUT, PATCH, and DELETE requests, with configurable timeouts.
 //
 // To create a new client, you have to call the following code:
@@ -7,9 +7,9 @@
 //
 // If you want to adjust the timeouts:
 //
-//		timeouts := InitTimeouts()
+//		timeouts := httpclient.NewDefaultTimeouts()
 //		// adjust any timeouts here
-//		client := httpclient.NewClientWithTimeouts(timeouts)
+//		client := httpclient.NewClient(httpclient.WithTimeouts(timeouts))
 //
 // Then, to make a request, call one of the service methods, e.g.:
 //		resp := client.GetJSON("http://site/path")
@@ -17,17 +17,12 @@
 // Once you have an user and a corresponding public API key, you can issue authenticated requests,
 // by constructing a new client with the appropriate credentials:
 //
-//		client := httpclient.NewClientWithAuthentication(username, password)
-//
-// The following can be used for authentication:
-//		- Ops Manager user credentials: (username, password)
-//		- Programmatic API keys: (publicKey, privateKey)
-//		- Ops Manager user and a Personal API Key (deprecated): (username, personalAPIKey)
-// You can read more about this topic here: https://docs.opsmanager.mongodb.com/master/tutorial/configure-public-api-access/#configure-public-api-access
+//		client := httpclient.NewClient(httpclient.WithDigestAuthentication(username, password))
 //
 package httpclient
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"gopkg.in/errgo.v1"
@@ -35,6 +30,7 @@ import (
 	"net"
 	"net/http"
 	"runtime"
+	"strings"
 
 	"github.com/Sectorbob/mlab-ns2/gae/ns/digest"
 )
@@ -62,9 +58,10 @@ func init() {
 	userAgent = fmt.Sprintf("pcgc/httpclient-%s (%s; %s)", ver, runtime.GOOS, runtime.GOARCH)
 }
 
-type basicHTTPClient struct {
-	client *http.Client
-	auth   *digest.Transport
+type basicClient struct {
+	client                    *http.Client
+	auth                      *digest.Transport
+	listOfAcceptedStatusCodes []int
 }
 
 // HTTPResponse wrapper for HTTP response objects
@@ -73,8 +70,8 @@ type HTTPResponse struct {
 	Err      error
 }
 
-// BasicHTTPOperation defines a contract for this client's API
-type BasicHTTPOperation interface {
+// BasicClient defines a contract for this client's API
+type BasicClient interface {
 	GetJSON(url string) HTTPResponse
 	PostJSON(url string, body io.Reader) HTTPResponse
 	PatchJSON(url string, body io.Reader) HTTPResponse
@@ -92,15 +89,44 @@ func (resp HTTPResponse) IsError() bool {
 	return resp.Err != nil
 }
 
-// NewClient builds a new HTTP client with default timeouts
-func NewClient() BasicHTTPOperation {
-	return NewClientWithTimeouts(InitTimeouts())
+// NewClient builds a new client, allowing for dynamic configuration
+// the order of the passed function matters, as they will be applied sequentially
+func NewClient(configs ...func(*basicClient)) BasicClient {
+	// initialize a bare client
+	client := &basicClient{client: &http.Client{}}
+
+	// configure defaults
+	WithDefaultTimeouts()(client)
+	WithAcceptedStatusCodes([]int{http.StatusOK, http.StatusCreated})(client)
+
+	// apply any other configurations
+	for _, configure := range configs {
+		configure(client)
+	}
+
+	return *client
 }
 
-// NewClientWithTimeouts builds a new HTTP client with specified timeouts
-func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
-	return basicHTTPClient{client: &http.Client{
-		Transport: &http.Transport{
+// WithDefaultTimeouts configures a client with default timeouts
+func WithDefaultTimeouts() func(*basicClient) {
+	return WithTimeouts(NewDefaultTimeouts())
+}
+
+// WithAcceptedStatusCodes configures a client with a list of accepted HTTP response status codes
+func WithAcceptedStatusCodes(acceptedStatusCodes []int) func(*basicClient) {
+	return func(client *basicClient) {
+		client.listOfAcceptedStatusCodes = acceptedStatusCodes
+	}
+}
+
+// WithTimeouts configures a client with the specified timeouts
+func WithTimeouts(timeouts *RequestTimeouts) func(*basicClient) {
+	return func(client *basicClient) {
+		// set global (total) timeout
+		client.client.Timeout = timeouts.GlobalTimeout
+
+		// set all other timeouts
+		client.client.Transport = &http.Transport{
 			DialContext: (&net.Dialer{
 				Timeout: timeouts.DialTimeout,
 			}).DialContext,
@@ -108,41 +134,40 @@ func NewClientWithTimeouts(timeouts *RequestTimeouts) BasicHTTPOperation {
 			IdleConnTimeout:       timeouts.IdleConnectionTimeout,
 			ResponseHeaderTimeout: timeouts.ResponseHeaderTimeout,
 			TLSHandshakeTimeout:   timeouts.TLSHandshakeTimeout,
-		},
-		Timeout: timeouts.GlobalTimeout,
-	}}
+		}
+	}
 }
 
-// NewClientWithAuthentication builds a new client which can use Digest authentication to make authenticated calls
-func NewClientWithAuthentication(username string, password string) BasicHTTPOperation {
-	client := NewClientWithTimeouts(InitTimeouts()).(basicHTTPClient)
-	client.auth = digest.NewTransport(username, password)
-	return client
+// WithDigestAuthentication configures a client with digest authentication credentials
+func WithDigestAuthentication(username string, password string) func(*basicClient) {
+	return func(client *basicClient) {
+		client.auth = digest.NewTransport(username, password)
+	}
 }
 
 // GetJSON retrieves the specified URL
-func (cl basicHTTPClient) GetJSON(url string) HTTPResponse {
-	return cl.genericJSONRequest("GET", url, nil, []int{http.StatusOK})
+func (cl basicClient) GetJSON(url string) HTTPResponse {
+	return cl.genericJSONRequest(http.MethodGet, url, nil)
 }
 
 // PostJson executes a POST request, sending the specified body, encoded as JSON, to the passed URL
-func (cl basicHTTPClient) PostJSON(url string, body io.Reader) HTTPResponse {
-	return cl.genericJSONRequest("POST", url, body, []int{http.StatusOK})
+func (cl basicClient) PostJSON(url string, body io.Reader) HTTPResponse {
+	return cl.genericJSONRequest(http.MethodPost, url, body)
 }
 
 // PutJSON executes a PUT request, sending the specified body, encoded as JSON, to the passed URL
-func (cl basicHTTPClient) PutJSON(url string, body io.Reader) (resp HTTPResponse) {
-	return cl.genericJSONRequest("PUT", url, body, []int{http.StatusOK})
+func (cl basicClient) PutJSON(url string, body io.Reader) (resp HTTPResponse) {
+	return cl.genericJSONRequest(http.MethodPut, url, body)
 }
 
 // PatchJSON executes a PATCH request, sending the specified body, encoded as JSON, to the passed URL
-func (cl basicHTTPClient) PatchJSON(url string, body io.Reader) (resp HTTPResponse) {
-	return cl.genericJSONRequest("PATCH", url, body, []int{http.StatusOK})
+func (cl basicClient) PatchJSON(url string, body io.Reader) (resp HTTPResponse) {
+	return cl.genericJSONRequest(http.MethodPatch, url, body)
 }
 
 // Delete executes a DELETE request
-func (cl basicHTTPClient) Delete(url string) (resp HTTPResponse) {
-	return cl.genericJSONRequest("DELETE", url, nil, []int{http.StatusOK})
+func (cl basicClient) Delete(url string) (resp HTTPResponse) {
+	return cl.genericJSONRequest(http.MethodDelete, url, nil)
 }
 
 // CloseResponseBodyIfNotNil simple helper which can ensure a response's body is correctly closed, if one exists
@@ -159,7 +184,7 @@ func CloseResponseBodyIfNotNil(resp HTTPResponse) {
 	useful.LogError(resp.Response.Body.Close)
 }
 
-func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Reader, expectedStatuses []int) (resp HTTPResponse) {
+func (cl basicClient) genericJSONRequest(verb string, url string, body io.Reader) (resp HTTPResponse) {
 	req, err := http.NewRequest(verb, url, body)
 	if err != nil {
 		resp.Err = err
@@ -181,7 +206,7 @@ func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Re
 		resp.Response, resp.Err = cl.client.Do(req)
 	}
 
-	if !validateStatusCode(&resp, expectedStatuses, verb, url) {
+	if !validateStatusCode(&resp, cl.listOfAcceptedStatusCodes, verb, url) {
 		// if the response code is not expected, stop here
 		return
 	}
@@ -202,7 +227,20 @@ func validateStatusCode(resp *HTTPResponse, expectedStatuses []int, verb string,
 		}
 	}
 
+	// parse response body
+	defer CloseResponseBodyIfNotNil(*resp)
+	var errorDetails interface{}
+	decoder := json.NewDecoder(resp.Response.Body)
+	err := decoder.Decode(&errorDetails)
+	useful.PanicOnUnrecoverableError(err)
+
 	// otherwise augment the error and return false
-	resp.Err = errgo.Notef(resp.Err, "Failed to execute %s request to %s; got status code %d (%v)", verb, url, resp.Response.StatusCode, resp.Response.Status)
+	sb := strings.Builder{}
+	sb.WriteString(fmt.Sprintf("failed to execute %s request to %s\n", verb, url))
+	sb.WriteString(fmt.Sprintf("status code: %d\n", resp.Response.StatusCode))
+	sb.WriteString(fmt.Sprintf("response: %s\n", resp.Response.Status))
+	sb.WriteString(fmt.Sprintf("details: %s\n", errorDetails))
+	resp.Err = errgo.Notef(resp.Err, sb.String())
+
 	return false
 }
