@@ -32,7 +32,6 @@ import (
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"gopkg.in/errgo.v1"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"runtime"
@@ -61,7 +60,6 @@ func init() {
 	}
 
 	userAgent = fmt.Sprintf("pcgc/httpclient-%s (%s; %s)", ver, runtime.GOOS, runtime.GOARCH)
-	log.Printf("User agent init=%s", userAgent)
 }
 
 type basicHTTPClient struct {

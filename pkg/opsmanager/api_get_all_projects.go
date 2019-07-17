@@ -61,8 +61,8 @@ func (api opsManagerAPI) GetAllProjects() (Projects, error) {
 	defer httpclient.CloseResponseBodyIfNotNil(resp)
 
 	decoder := json.NewDecoder(resp.Response.Body)
-	err2 := decoder.Decode(&result)
-	useful.PanicOnUnrecoverableError(err2)
+	err := decoder.Decode(&result)
+	useful.PanicOnUnrecoverableError(err)
 
 	return result, nil
 }
