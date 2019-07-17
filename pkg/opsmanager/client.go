@@ -30,10 +30,10 @@
 //		withHTTPClient := opsmanager.WithHTTPClient(httpclient.NewClient(withDigestAuth))
 //		client := opsmanager.NewClient(withResolver, withHTTPClient)
 //
-// The following credential pairs can be used for authentication:
-//		- Ops Manager user credentials: (username, password)
-//		- Programmatic API keys: (publicKey, privateKey)
-//		- Ops Manager user and a Personal API Key (deprecated): (username, personalAPIKey)
+// The following can be used for authentication:
+//		- Ops Manager user credentials: (username, password) - only works with some APIs and should not be used
+//		- Programmatic API keys: (publicKey, privateKey) - preferred credentials pair
+//		- Ops Manager user and a Personal API Key: (username, personalAPIKey) - deprecated
 // You can read more about this topic here: https://docs.opsmanager.mongodb.com/master/tutorial/configure-public-api-access/#configure-public-api-access
 //
 package opsmanager

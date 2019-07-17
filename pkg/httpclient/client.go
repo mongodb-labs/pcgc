@@ -7,9 +7,9 @@
 //
 // If you want to adjust the timeouts:
 //
-//		timeouts := InitDefaultTimeouts()
+//		timeouts := httpclient.NewDefaultTimeouts()
 //		// adjust any timeouts here
-//		client := httpclient.NewClientWithTimeouts(timeouts)
+//		client := httpclient.NewClient(httpclient.WithTimeouts(timeouts))
 //
 // Then, to make a request, call one of the service methods, e.g.:
 //		resp := client.GetJSON("http://site/path")
@@ -17,13 +17,7 @@
 // Once you have an user and a corresponding public API key, you can issue authenticated requests,
 // by constructing a new client with the appropriate credentials:
 //
-//		client := httpclient.NewClientWithAuthentication(username, password)
-//
-// The following can be used for authentication:
-//		- Ops Manager user credentials: (username, password)
-//		- Programmatic API keys: (publicKey, privateKey)
-//		- Ops Manager user and a Personal API Key (deprecated): (username, personalAPIKey)
-// You can read more about this topic here: https://docs.opsmanager.mongodb.com/master/tutorial/configure-public-api-access/#configure-public-api-access
+//		client := httpclient.NewClient(httpclient.WithDigestAuthentication(username, password))
 //
 package httpclient
 
