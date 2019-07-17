@@ -43,7 +43,7 @@ type CreateFirstUserResponse struct {
 
 // CreateFirstUser registers the first ever Ops Manager user (global owner)
 // https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
-func (api opsManagerAPI) CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error) {
+func (api opsManagerClient) CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error) {
 	var result CreateFirstUserResponse
 
 	bodyBytes, err := json.Marshal(user)

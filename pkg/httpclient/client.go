@@ -1,4 +1,4 @@
-// Package httpclient is a simple HTTP client which supports sending and receiving JSON strings using
+// Package httpclient hosts a simple HTTP client which supports sending and receiving JSON data using
 // GET, POST, PUT, PATCH, and DELETE requests, with configurable timeouts.
 //
 // To create a new client, you have to call the following code:
@@ -58,7 +58,7 @@ func init() {
 	userAgent = fmt.Sprintf("pcgc/httpclient-%s (%s; %s)", ver, runtime.GOOS, runtime.GOARCH)
 }
 
-type basicHTTPClient struct {
+type basicClient struct {
 	client                    *http.Client
 	auth                      *digest.Transport
 	listOfAcceptedStatusCodes []int
@@ -70,8 +70,8 @@ type HTTPResponse struct {
 	Err      error
 }
 
-// BasicHTTPClient defines a contract for this client's API
-type BasicHTTPClient interface {
+// BasicClient defines a contract for this client's API
+type BasicClient interface {
 	GetJSON(url string) HTTPResponse
 	PostJSON(url string, body io.Reader) HTTPResponse
 	PatchJSON(url string, body io.Reader) HTTPResponse
@@ -91,9 +91,9 @@ func (resp HTTPResponse) IsError() bool {
 
 // NewClient builds a new client, allowing for dynamic configuration
 // the order of the passed function matters, as they will be applied sequentially
-func NewClient(configs ...func(*basicHTTPClient)) BasicHTTPClient {
+func NewClient(configs ...func(*basicClient)) BasicClient {
 	// initialize a bare client
-	client := &basicHTTPClient{client: &http.Client{}}
+	client := &basicClient{client: &http.Client{}}
 
 	// configure defaults
 	WithDefaultTimeouts()(client)
@@ -108,20 +108,20 @@ func NewClient(configs ...func(*basicHTTPClient)) BasicHTTPClient {
 }
 
 // WithDefaultTimeouts configures a client with default timeouts
-func WithDefaultTimeouts() func(*basicHTTPClient) {
+func WithDefaultTimeouts() func(*basicClient) {
 	return WithTimeouts(NewDefaultTimeouts())
 }
 
 // WithAcceptedStatusCodes configures a client with a list of accepted HTTP response status codes
-func WithAcceptedStatusCodes(acceptedStatusCodes []int) func(*basicHTTPClient) {
-	return func(client *basicHTTPClient) {
+func WithAcceptedStatusCodes(acceptedStatusCodes []int) func(*basicClient) {
+	return func(client *basicClient) {
 		client.listOfAcceptedStatusCodes = acceptedStatusCodes
 	}
 }
 
 // WithTimeouts configures a client with the specified timeouts
-func WithTimeouts(timeouts *RequestTimeouts) func(*basicHTTPClient) {
-	return func(client *basicHTTPClient) {
+func WithTimeouts(timeouts *RequestTimeouts) func(*basicClient) {
+	return func(client *basicClient) {
 		// set global (total) timeout
 		client.client.Timeout = timeouts.GlobalTimeout
 
@@ -139,34 +139,34 @@ func WithTimeouts(timeouts *RequestTimeouts) func(*basicHTTPClient) {
 }
 
 // WithDigestAuthentication configures a client with digest authentication credentials
-func WithDigestAuthentication(username string, password string) func(*basicHTTPClient) {
-	return func(client *basicHTTPClient) {
+func WithDigestAuthentication(username string, password string) func(*basicClient) {
+	return func(client *basicClient) {
 		client.auth = digest.NewTransport(username, password)
 	}
 }
 
 // GetJSON retrieves the specified URL
-func (cl basicHTTPClient) GetJSON(url string) HTTPResponse {
+func (cl basicClient) GetJSON(url string) HTTPResponse {
 	return cl.genericJSONRequest(http.MethodGet, url, nil)
 }
 
 // PostJson executes a POST request, sending the specified body, encoded as JSON, to the passed URL
-func (cl basicHTTPClient) PostJSON(url string, body io.Reader) HTTPResponse {
+func (cl basicClient) PostJSON(url string, body io.Reader) HTTPResponse {
 	return cl.genericJSONRequest(http.MethodPost, url, body)
 }
 
 // PutJSON executes a PUT request, sending the specified body, encoded as JSON, to the passed URL
-func (cl basicHTTPClient) PutJSON(url string, body io.Reader) (resp HTTPResponse) {
+func (cl basicClient) PutJSON(url string, body io.Reader) (resp HTTPResponse) {
 	return cl.genericJSONRequest(http.MethodPut, url, body)
 }
 
 // PatchJSON executes a PATCH request, sending the specified body, encoded as JSON, to the passed URL
-func (cl basicHTTPClient) PatchJSON(url string, body io.Reader) (resp HTTPResponse) {
+func (cl basicClient) PatchJSON(url string, body io.Reader) (resp HTTPResponse) {
 	return cl.genericJSONRequest(http.MethodPatch, url, body)
 }
 
 // Delete executes a DELETE request
-func (cl basicHTTPClient) Delete(url string) (resp HTTPResponse) {
+func (cl basicClient) Delete(url string) (resp HTTPResponse) {
 	return cl.genericJSONRequest(http.MethodDelete, url, nil)
 }
 
@@ -184,7 +184,7 @@ func CloseResponseBodyIfNotNil(resp HTTPResponse) {
 	useful.LogError(resp.Response.Body.Close)
 }
 
-func (cl basicHTTPClient) genericJSONRequest(verb string, url string, body io.Reader) (resp HTTPResponse) {
+func (cl basicClient) genericJSONRequest(verb string, url string, body io.Reader) (resp HTTPResponse) {
 	req, err := http.NewRequest(verb, url, body)
 	if err != nil {
 		resp.Err = err

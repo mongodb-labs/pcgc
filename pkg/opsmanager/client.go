@@ -1,4 +1,4 @@
-// Package opsmanager is a HTTP client which abstracts communication with an Ops Manager instance.
+// Package opsmanager hosts a HTTP client which abstracts communication with Ops Manager instances.
 //
 // To create a new client, you have to call the following code:
 //
@@ -45,15 +45,15 @@ import (
 	"io"
 )
 
-type opsManagerAPI struct {
-	httpclient.BasicHTTPClient
+type opsManagerClient struct {
+	httpclient.BasicClient
 
 	resolver httpclient.URLResolver
 }
 
 // Client defines the API actions implemented in this client
 type Client interface {
-	httpclient.BasicHTTPClient
+	httpclient.BasicClient
 
 	// https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
 	CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error)
@@ -79,9 +79,9 @@ type Client interface {
 }
 
 // NewClient builds a new API client for connecting to Ops Manager
-func NewClient(configs ...func(*opsManagerAPI)) Client {
+func NewClient(configs ...func(*opsManagerClient)) Client {
 	// initialize a bare client
-	client := &opsManagerAPI{}
+	client := &opsManagerClient{}
 
 	// apply all configurations
 	for _, configure := range configs {
@@ -92,7 +92,7 @@ func NewClient(configs ...func(*opsManagerAPI)) Client {
 	if client.resolver == nil {
 		useful.PanicOnUnrecoverableError(errors.New("the client requires a URLResolver with the appropriate Ops Manager URL configured"))
 	}
-	if client.BasicHTTPClient == nil {
+	if client.BasicClient == nil {
 		useful.PanicOnUnrecoverableError(errors.New("the client requires an underlying basic HTTP client to be configured"))
 	}
 
@@ -100,15 +100,15 @@ func NewClient(configs ...func(*opsManagerAPI)) Client {
 }
 
 // WithResolver configures an Ops Manager client which relies on the specified resolver
-func WithResolver(resolver httpclient.URLResolver) func(*opsManagerAPI) {
-	return func(api *opsManagerAPI) {
-		api.resolver = resolver
+func WithResolver(resolver httpclient.URLResolver) func(*opsManagerClient) {
+	return func(client *opsManagerClient) {
+		client.resolver = resolver
 	}
 }
 
 // WithHTTPClient configures an Ops Manager which delegates basic HTTP operations to the specified client
-func WithHTTPClient(client httpclient.BasicHTTPClient) func(*opsManagerAPI) {
-	return func(api *opsManagerAPI) {
-		api.BasicHTTPClient = client
+func WithHTTPClient(client httpclient.BasicClient) func(*opsManagerClient) {
+	return func(client *opsManagerClient) {
+		client.BasicClient = client
 	}
 }
