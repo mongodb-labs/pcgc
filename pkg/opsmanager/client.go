@@ -46,14 +46,14 @@ import (
 )
 
 type opsManagerAPI struct {
-	httpclient.BasicHTTPOperation
+	httpclient.BasicHTTPClient
 
 	resolver httpclient.URLResolver
 }
 
 // Client defines the API actions implemented in this client
 type Client interface {
-	httpclient.BasicHTTPOperation
+	httpclient.BasicHTTPClient
 
 	// https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
 	CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error)
@@ -92,7 +92,7 @@ func NewClient(configs ...func(*opsManagerAPI)) Client {
 	if client.resolver == nil {
 		useful.PanicOnUnrecoverableError(errors.New("the client requires a URLResolver with the appropriate Ops Manager URL configured"))
 	}
-	if client.BasicHTTPOperation == nil {
+	if client.BasicHTTPClient == nil {
 		useful.PanicOnUnrecoverableError(errors.New("the client requires an underlying basic HTTP client to be configured"))
 	}
 
@@ -107,8 +107,8 @@ func WithResolver(resolver httpclient.URLResolver) func(*opsManagerAPI) {
 }
 
 // WithHTTPClient configures an Ops Manager which delegates basic HTTP operations to the specified client
-func WithHTTPClient(client httpclient.BasicHTTPOperation) func(*opsManagerAPI) {
+func WithHTTPClient(client httpclient.BasicHTTPClient) func(*opsManagerAPI) {
 	return func(api *opsManagerAPI) {
-		api.BasicHTTPOperation = client
+		api.BasicHTTPClient = client
 	}
 }

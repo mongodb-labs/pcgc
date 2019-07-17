@@ -70,8 +70,8 @@ type HTTPResponse struct {
 	Err      error
 }
 
-// BasicHTTPOperation defines a contract for this client's API
-type BasicHTTPOperation interface {
+// BasicHTTPClient defines a contract for this client's API
+type BasicHTTPClient interface {
 	GetJSON(url string) HTTPResponse
 	PostJSON(url string, body io.Reader) HTTPResponse
 	PatchJSON(url string, body io.Reader) HTTPResponse
@@ -91,7 +91,7 @@ func (resp HTTPResponse) IsError() bool {
 
 // NewClient builds a new client, allowing for dynamic configuration
 // the order of the passed function matters, as they will be applied sequentially
-func NewClient(configs ...func(*basicHTTPClient)) BasicHTTPOperation {
+func NewClient(configs ...func(*basicHTTPClient)) BasicHTTPClient {
 	// initialize a bare client
 	client := &basicHTTPClient{client: &http.Client{}}
 
