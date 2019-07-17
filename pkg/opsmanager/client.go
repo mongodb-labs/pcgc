@@ -59,11 +59,10 @@ type Client interface {
 	CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/get-all-groups-for-current-user/
 	GetAllProjects() (ProjectsResponse, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/create-one-group/
+	CreateOneProject(name string, orgID string) (CreateOneProjectResponse, error)
 
 	// Method contracts: will be implemented later
-
-	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/create-one-group/
-	CreateOneProject(name string, orgID string) (interface{}, error)
 
 	// https://docs.opsmanager.mongodb.com/master/reference/api/agentapikeys/create-one-agent-api-key/
 	CreateAgentAPIKEY(projectID string, name string) (interface{}, error)
