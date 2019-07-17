@@ -33,7 +33,6 @@
 //		- Ops Manager user and a Personal API Key (deprecated): (username, personalAPIKey)
 // You can read more about this topic here: https://docs.opsmanager.mongodb.com/master/tutorial/configure-public-api-access/#configure-public-api-access
 //
-
 package opsmanager
 
 import (

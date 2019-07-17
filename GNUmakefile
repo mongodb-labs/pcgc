@@ -41,8 +41,9 @@ test-compile:
 	@echo "==> Compiling test binary..."
 	go test -c $(TEST) $(TESTARGS)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck lint test-compile
+.PHONY: build install test testacc vet fmt fmtcheck errcheck lint test-compile init-git-hooks
 
+# Build targets
 clean:
 	@echo "==> Cleaning build artifacts..."
 	rm -rf out
@@ -61,3 +62,9 @@ build: fmtcheck errcheck lint test
 install: fmtcheck errcheck lint test
 	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
 	go install -ldflags='-X "github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)"' .
+
+# GIT hooks
+link-git-hooks:
+	@echo "==> Installing all git hooks..."
+	find .git/hooks -type l -exec rm {} \;
+	find .githooks -type f -exec ln -sf ../../{} .git/hooks/ \;

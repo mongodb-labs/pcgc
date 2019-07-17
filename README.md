@@ -85,3 +85,21 @@ This library is licensed under the terms of the [Apache License, Version 2.0](ht
 ### Feature Backlog
 
 - [ ] TBD
+
+
+### Setting up the development environment
+
+Pull requests are always welcome! Please read our [contributor guide](./CONTRIB.md) before starting any work.  
+
+The steps below should help you get started.  They have been tested on MacOS, but should work on Linux systems as well (with minor adaptations.)
+
+1. Install GO (1.12+)
+```
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+```
+
+Ensure `$GOROOT/bin` is in your path.
+
+2. Install the git hooks, to automatically fix linting issues and flag any errors 
+
+`make link-git-hooks`

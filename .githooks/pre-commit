@@ -1,0 +1,4 @@
+$!/usr/bin/env bash
+echo "==> Running pre-commit git hook..."
+make vet fmt fmtcheck errcheck lint
+
