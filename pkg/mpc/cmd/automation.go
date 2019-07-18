@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // projectsCmd represents the automation command
@@ -39,11 +40,23 @@ var automationRetrieveCmd = &cobra.Command{
 	},
 }
 
+func aliasNormalizeFunc(_ *pflag.FlagSet, name string) pflag.NormalizedName {
+	switch name {
+	case "group-id":
+		name = "project-id"
+	}
+	return pflag.NormalizedName(name)
+}
+
 func init() {
-	automationStatusCmd.Flags().StringVar(&projectID, "project-id", "", "Organization ID for the group")
+	automationStatusCmd.Flags().StringVar(&projectID, "project-id", "", "Project ID, group-id can also be used")
 	_ = automationStatusCmd.MarkFlagRequired("project-id")
-	automationRetrieveCmd.Flags().StringVar(&projectID, "project-id", "", "Organization ID for the group")
+	automationStatusCmd.Flags().SetNormalizeFunc(aliasNormalizeFunc)
+
+	automationRetrieveCmd.Flags().StringVar(&projectID, "project-id", "", "Project ID, group-id can also be used")
 	_ = automationRetrieveCmd.MarkFlagRequired("project-id")
+	automationRetrieveCmd.Flags().SetNormalizeFunc(aliasNormalizeFunc)
+
 	rootCmd.AddCommand(automationCmd)
 	automationCmd.AddCommand(automationStatusCmd)
 	automationCmd.AddCommand(automationRetrieveCmd)

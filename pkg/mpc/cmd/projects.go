@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -18,7 +19,6 @@ var projectsCmd = &cobra.Command{
 var listProjectsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List projects",
-
 	Run: func(cmd *cobra.Command, args []string) {
 		projects, err := newClient().GetAllProjects()
 
@@ -34,11 +34,13 @@ var listProjectsCmd = &cobra.Command{
 var createProjectCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a project",
-
-	Run: func(cmd *cobra.Command, args []string) {
+	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			exitOnErr("create needs a name for the project")
+			return errors.New("requires a name argument")
 		}
+		return nil
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		newProject, err := newClient().CreateOneProject(args[0], orgID)
 
 		exitOnErr(err)
