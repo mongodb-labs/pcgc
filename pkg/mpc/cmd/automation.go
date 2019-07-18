@@ -59,7 +59,6 @@ var automationUpdateCmd = &cobra.Command{
 		exitOnErr(err2)
 
 		_, err3 := newAuthenticatedClient().UpdateAutomationConfig(projectID, data)
-
 		exitOnErr(err3)
 
 		fmt.Println("Applying new configuration...")
