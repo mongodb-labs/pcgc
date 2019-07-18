@@ -10,8 +10,10 @@ import (
 )
 
 var (
-	cfgFile string
-	version string
+	cfgFile   string
+	version   string
+	orgID     string
+	projectID string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -25,23 +27,14 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		er(err)
-	}
+	err := rootCmd.Execute()
+	exitOnErr(err)
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mpc.json)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -52,14 +45,12 @@ func initConfig() {
 	} else {
 		// Find home directory.
 		home, err := homedir.Dir()
-		if err != nil {
-			er(err)
-		}
+		exitOnErr(err)
 		_, err2 := os.OpenFile(home+"/.mpc.json", os.O_RDONLY|os.O_CREATE, 0600)
-		if err2 != nil {
-			er(err)
-		}
+		exitOnErr(err2)
 
+		viper.SetEnvPrefix("mpc")
+		viper.AutomaticEnv()
 		viper.SetConfigType("json")
 		viper.SetConfigName(".mpc")
 		// Search config in home directory with name ".mpc" (without extension).

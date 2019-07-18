@@ -41,4 +41,6 @@ type Process struct {
 	Hostname                    string     `json:"hostname,omitempty"`
 	Args26                      *Args26    `json:"args2_6,omitempty"`
 	LogRotate                   *LogRotate `json:"logRotate,omitempty"`
+	Plan                        []string   `json:"plan,omitempty"`
+	LastGoalVersionAchieved     int        `json:"lastGoalVersionAchieved,omitempty"`
 }
