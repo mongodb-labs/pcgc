@@ -65,14 +65,10 @@ type Client interface {
 	GetAutomationConfig(projectID string) (AutomationConfig, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/agents-get-by-type/
 	GetAgentsByType(projectID string, agentType string) (GetAgentsByTypeResponse, error)
-
-	// Method contracts: will be implemented later
-
+	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration
+	UpdateDeployments(projectID string, body io.Reader) (map[string]interface{}, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/agentapikeys/create-one-agent-api-key/
 	CreateAgentAPIKEY(projectID string, name string) (interface{}, error)
-
-	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration
-	UpdateAutomationConfig(projectID string, body io.Reader) (interface{}, error)
 }
 
 // NewClient builds a new API client for connecting to Ops Manager

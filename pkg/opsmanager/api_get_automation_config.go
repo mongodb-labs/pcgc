@@ -12,12 +12,12 @@ type VersionHostnamePair struct {
 	Hostname string `json:"hostname"`
 }
 
-// Cluster represents a cluster definition within an automation config object
+// AutomationCluster represents a cluster definition within an automation config object
 // NOTE: this struct is mutable
-type Cluster struct {
+type AutomationCluster struct {
 	Auth               map[string]interface{}   `json:"auth,omitempty"`
 	LDAP               map[string]interface{}   `json:"ldap,omitempty"`
-	Processes          []map[string]interface{} `json:"processes,omitempty"`
+	Processes          []*Process `json:"processes,omitempty"`
 	ReplicaSets        []map[string]interface{} `json:"replicaSets,omitempty"`
 	Roles              map[string]interface{}   `json:"roles,omitempty"`
 	MonitoringVersions []*VersionHostnamePair   `json:"monitoringVersions,omitempty"`
@@ -50,7 +50,7 @@ type AutomationConfig struct {
 	LatestMonitoringAgentVersionName string                 `json:"latestMonitoringAgentVersionName,omitempty"`
 	LatestBackupAgentVersionName     string                 `json:"latestBackupAgentVersionName,omitempty"`
 	LatestBiConnectorVersionName     string                 `json:"latestBiConnectorVersionName,omitempty"`
-	Cluster                          *Cluster               `json:"cluster,omitempty"`
+	Cluster                          *AutomationCluster     `json:"cluster,omitempty"`
 	VersionConfig                    map[string]interface{} `json:"versionConfig,omitempty"`
 	LogRotate                        map[string]interface{} `json:"logRotate,omitempty"`
 	MonitoringAgentTemplate          map[string]interface{} `json:"monitoringAgentTemplate,omitempty"`
