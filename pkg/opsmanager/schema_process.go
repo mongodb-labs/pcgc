@@ -25,8 +25,8 @@ type Args26 struct {
 
 // LogRotate part of the internal Process struct
 type LogRotate struct {
-	SizeThresholdMB  int `json:"sizeThresholdMB,omitempty"`
-	TimeThresholdHrs int `json:"timeThresholdHrs,omitempty"`
+	SizeThresholdMB  float64 `json:"sizeThresholdMB,omitempty"`
+	TimeThresholdHrs int     `json:"timeThresholdHrs,omitempty"`
 }
 
 // Process represents a single process in a deployment
