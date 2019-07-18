@@ -47,7 +47,8 @@ var automationRetrieveCmd = &cobra.Command{
 // automationStatusCmd represents  status command
 var automationUpdateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Automation retrieve",
+	Short: "Automation update from a file",
+	Long:  "Apply a new automation config to your group",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		file, err := ioutil.ReadFile(file)
