@@ -61,7 +61,7 @@ build: fmtcheck errcheck lint test
 	go build $(ldflags) ./...
 	go build $(ldflags) -o out/mpc ./pkg/mpc
 
-install: fmtcheck errcheck lint test
+install: build
 	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
 	go install $(ldflags) ./pkg/mpc
 
