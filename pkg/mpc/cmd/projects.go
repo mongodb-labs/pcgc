@@ -3,10 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/mongodb-labs/pcgc/pkg/httpclient"
-	"github.com/mongodb-labs/pcgc/pkg/opsmanager"
-	"github.com/spf13/viper"
-
 	"github.com/spf13/cobra"
 )
 
