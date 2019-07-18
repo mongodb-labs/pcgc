@@ -89,7 +89,7 @@ func init() {
 	_ = automationUpdateCmd.MarkFlagRequired("project-id")
 	_ = automationUpdateCmd.MarkFlagRequired("file")
 	automationUpdateCmd.Flags().SetNormalizeFunc(aliasProjectIDToGroupID)
-	ConfResource
+
 	rootCmd.AddCommand(automationCmd)
 	automationCmd.AddCommand(automationStatusCmd)
 	automationCmd.AddCommand(automationRetrieveCmd)
