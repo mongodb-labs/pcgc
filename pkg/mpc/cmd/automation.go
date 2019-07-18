@@ -1,8 +1,12 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/mongodb-labs/pcgc/pkg/opsmanager"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"io/ioutil"
 )
 
 // projectsCmd represents the automation command
@@ -40,7 +44,28 @@ var automationRetrieveCmd = &cobra.Command{
 	},
 }
 
-func aliasNormalizeFunc(_ *pflag.FlagSet, name string) pflag.NormalizedName {
+// automationStatusCmd represents  status command
+var automationUpdateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Automation retrieve",
+
+	Run: func(cmd *cobra.Command, args []string) {
+		file, err := ioutil.ReadFile(file)
+		exitOnErr(err)
+		data := opsmanager.AutomationConfig{}
+
+		err2 := json.Unmarshal([]byte(file), &data)
+		exitOnErr(err2)
+
+		_, err3 := newAuthenticatedClient().UpdateAutomationConfig(projectID, data)
+
+		exitOnErr(err3)
+
+		fmt.Println("Applying new configuration...")
+	},
+}
+
+func aliasProjectIDToGroupID(_ *pflag.FlagSet, name string) pflag.NormalizedName {
 	switch name {
 	case "group-id":
 		name = "project-id"
@@ -48,16 +73,25 @@ func aliasNormalizeFunc(_ *pflag.FlagSet, name string) pflag.NormalizedName {
 	return pflag.NormalizedName(name)
 }
 
+var file string
+
 func init() {
 	automationStatusCmd.Flags().StringVar(&projectID, "project-id", "", "Project ID, group-id can also be used")
 	_ = automationStatusCmd.MarkFlagRequired("project-id")
-	automationStatusCmd.Flags().SetNormalizeFunc(aliasNormalizeFunc)
+	automationStatusCmd.Flags().SetNormalizeFunc(aliasProjectIDToGroupID)
 
 	automationRetrieveCmd.Flags().StringVar(&projectID, "project-id", "", "Project ID, group-id can also be used")
 	_ = automationRetrieveCmd.MarkFlagRequired("project-id")
-	automationRetrieveCmd.Flags().SetNormalizeFunc(aliasNormalizeFunc)
+	automationRetrieveCmd.Flags().SetNormalizeFunc(aliasProjectIDToGroupID)
 
+	automationUpdateCmd.Flags().StringVar(&projectID, "project-id", "", "Project ID, group-id can also be used")
+	automationUpdateCmd.Flags().StringVarP(&file, "file", "f", "", "File to read the config")
+	_ = automationUpdateCmd.MarkFlagRequired("project-id")
+	_ = automationUpdateCmd.MarkFlagRequired("file")
+	automationUpdateCmd.Flags().SetNormalizeFunc(aliasProjectIDToGroupID)
+	ConfResource
 	rootCmd.AddCommand(automationCmd)
 	automationCmd.AddCommand(automationStatusCmd)
 	automationCmd.AddCommand(automationRetrieveCmd)
+	automationCmd.AddCommand(automationUpdateCmd)
 }
