@@ -63,6 +63,8 @@ type Client interface {
 	CreateOneProject(name string, orgID string) (CreateOneProjectResponse, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#get-the-automation-configuration
 	GetAutomationConfig(projectID string) (AutomationConfig, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-status/
+	GetAutomationStatus(projectID string) (AutomationStatusResponse, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/agents-get-by-type/
 	GetAgentsByType(projectID string, agentType string) (GetAgentsByTypeResponse, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration

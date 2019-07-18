@@ -28,7 +28,7 @@ var configureCmd = &cobra.Command{
 		fmt.Print("Enter Public Key: ")
 		username, _ := reader.ReadString('\n')
 
-		viper.Set("username", strings.TrimSpace(username))
+		viper.Set("public_key", strings.TrimSpace(username))
 
 		fmt.Print("Enter Private Key: ")
 		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
@@ -36,7 +36,7 @@ var configureCmd = &cobra.Command{
 			er(err)
 		}
 		password := string(bytePassword)
-		viper.Set("password", strings.TrimSpace(password))
+		viper.Set("private_key", strings.TrimSpace(password))
 
 		err = viper.WriteConfig()
 		if err != nil {
