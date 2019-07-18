@@ -7,9 +7,6 @@ import (
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 )
 
-// WhitelistAllowAll allows API access from any IPv4 address
-const WhitelistAllowAll = "0.0.0.1/0"
-
 // User request object which identifies a user
 type User struct {
 	Username     string `json:"username"`
@@ -42,6 +39,7 @@ type CreateFirstUserResponse struct {
 }
 
 // CreateFirstUser registers the first ever Ops Manager user (global owner)
+// pass a whitelist of 0.0.0.1/0 if you want to whitelist all IPv4 addresses
 // https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
 func (client opsManagerClient) CreateFirstUser(user User, whitelistIP string) (CreateFirstUserResponse, error) {
 	var result CreateFirstUserResponse
@@ -51,7 +49,14 @@ func (client opsManagerClient) CreateFirstUser(user User, whitelistIP string) (C
 		return result, err
 	}
 
-	url := client.resolver.Of("/unauth/users?whitelist=%s", whitelistIP)
+	// if a whitelist was not specified, do not pass the parameter
+	var url string
+	if whitelistIP == "" {
+		url = client.resolver.Of("/unauth/users")
+	} else {
+		url = client.resolver.Of("/unauth/users?whitelist=%s", whitelistIP)
+	}
+
 	resp := client.PostJSON(url, bytes.NewReader(bodyBytes))
 	if resp.IsError() {
 		return result, resp.Err
@@ -59,8 +64,8 @@ func (client opsManagerClient) CreateFirstUser(user User, whitelistIP string) (C
 	defer httpclient.CloseResponseBodyIfNotNil(resp)
 
 	decoder := json.NewDecoder(resp.Response.Body)
-	err2 := decoder.Decode(&result)
-	useful.PanicOnUnrecoverableError(err2)
+	err = decoder.Decode(&result)
+	useful.PanicOnUnrecoverableError(err)
 
 	return result, nil
 }

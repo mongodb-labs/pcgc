@@ -36,7 +36,7 @@ type MongoDBVersion struct {
 	Builds []Build `json:"builds,omitempty"`
 }
 
-// AutomationConfigResponse represents a cluster definition within an automation config object
+// AutomationConfig represents a cluster definition within an automation config object
 // NOTE: this struct is mutable
 type AutomationConfig struct {
 	Auth               map[string]interface{}   `json:"auth,omitempty"`

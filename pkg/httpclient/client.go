@@ -215,6 +215,11 @@ func (cl basicClient) genericJSONRequest(verb string, url string, body io.Reader
 }
 
 func validateStatusCode(resp *HTTPResponse, expectedStatuses []int, verb string, url string) bool {
+	// no response => not valid
+	if resp == nil || resp.Response == nil {
+		return false
+	}
+
 	// nothing to check
 	if len(expectedStatuses) == 0 {
 		return true
