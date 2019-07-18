@@ -12,28 +12,15 @@ This library is licensed under the terms of the [Apache License, Version 2.0](ht
 ### Desired feature set for release v0.1.0
 
 - [x] Register the first user
-  - send the IP whitelist
-  - return: `publicApiKey`
-
 - [x] Implement digest authentication (not available in Go's http client) 
-
-- [ ] Create a project
-  - https://docs.opsmanager.mongodb.com/master/reference/api/groups/create-one-group/
-  - return: `groupId`
-
-- [ ] Create an agent API key
-  https://docs.opsmanager.mongodb.com/master/reference/api/agentapikeys/create-one-agent-api-key/
-  - return: `mmsApiKey`
-
-- [ ] Retrieve the monitoring version from the automation config
-  https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#get-the-automation-configuration
-  `{"automationAgentVersion":"5.8.0.5546-1","monitoringAgentVersion":"6.7.0.466-1","biConnectorVersion":"2.6.1","backupAgentVersion":"7.1.0.1011-1"}`
-
-- [ ] Get all hosts in a Project
-  https://docs.opsmanager.mongodb.com/current/reference/api/hosts/get-all-hosts-in-group/
-
-- [ ] Update the automation config: enable monitoring
-  https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration
+- [x] Create a project
+- [x] Create an agent API key
+- [x] Retrieve the automation config
+- [x] Get all agents in a Project by type
+- [x] Patch the automation config: update Deployments
+- [ ] Merge an existing automation config with new changes (e.g. `Process`)
+- [ ] Wait for goal state
+- [ ] Enable monitoring: edit `AutomationCluster` and enable monitoring (add a `VersionHostnamePair`)
   ```json
     {
         "monitoringVersions": [{
@@ -42,8 +29,7 @@ This library is licensed under the terms of the [Apache License, Version 2.0](ht
         }]
     }
   ```
-
-- [ ] Patch the automation config: deploy a standalone (insert an entry into `processes`)
+- [ ] Deploy a standalone (insert a new `Process` into `AutomationCluster`)
   ```json
     {
           "cluster": {
@@ -80,12 +66,6 @@ This library is licensed under the terms of the [Apache License, Version 2.0](ht
     }
   ```
 
-- [ ] Publish the automation config and wait for goal state
-
-### Feature Backlog
-
-- [ ] TBD
-
 
 ### Setting up the development environment
 
@@ -103,3 +83,12 @@ Ensure `$GOROOT/bin` is in your path.
 2. Install the git hooks, to automatically fix linting issues and flag any errors 
 
 `make link-git-hooks`
+
+### Installing the CLI tool (mpc)
+
+```
+make install # mpc will be deployed into $GOPATH/bin
+
+# Run mpc to see its usage
+mpc
+```
