@@ -38,7 +38,7 @@ type MongoDBVersion struct {
 
 // AutomationConfigResponse represents a cluster definition within an automation config object
 // NOTE: this struct is mutable
-type AutomationConfigResponse struct {
+type AutomationConfig struct {
 	Auth               map[string]interface{}   `json:"auth,omitempty"`
 	LDAP               map[string]interface{}   `json:"ldap,omitempty"`
 	Processes          []*Process               `json:"processes,omitempty"`
@@ -63,8 +63,8 @@ type AutomationConfigResponse struct {
 
 // GetAutomationConfig
 // https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#get-the-automation-configuration
-func (client opsManagerClient) GetAutomationConfig(projectID string) (AutomationConfigResponse, error) {
-	var result AutomationConfigResponse
+func (client opsManagerClient) GetAutomationConfig(projectID string) (AutomationConfig, error) {
+	var result AutomationConfig
 
 	url := client.resolver.Of("/groups/%s/automationConfig", projectID)
 	resp := client.GetJSON(url)
