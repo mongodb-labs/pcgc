@@ -68,7 +68,7 @@ type Client interface {
 	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration
 	UpdateDeployments(projectID string, body io.Reader) (map[string]interface{}, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/agentapikeys/create-one-agent-api-key/
-	CreateAgentAPIKEY(projectID string, name string) (interface{}, error)
+	CreateAgentAPIKEY(projectID string, desc string) (CreateAgentAPIKEYResponse, error)
 }
 
 // NewClient builds a new API client for connecting to Ops Manager

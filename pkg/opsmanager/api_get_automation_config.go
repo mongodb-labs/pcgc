@@ -17,7 +17,7 @@ type VersionHostnamePair struct {
 type AutomationCluster struct {
 	Auth               map[string]interface{}   `json:"auth,omitempty"`
 	LDAP               map[string]interface{}   `json:"ldap,omitempty"`
-	Processes          []*Process `json:"processes,omitempty"`
+	Processes          []*Process               `json:"processes,omitempty"`
 	ReplicaSets        []map[string]interface{} `json:"replicaSets,omitempty"`
 	Roles              map[string]interface{}   `json:"roles,omitempty"`
 	MonitoringVersions []*VersionHostnamePair   `json:"monitoringVersions,omitempty"`
