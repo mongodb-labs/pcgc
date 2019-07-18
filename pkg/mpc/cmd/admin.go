@@ -47,7 +47,7 @@ var adminCreate = &cobra.Command{
 			FirstName: strings.TrimSpace(firstName),
 			LastName:  strings.TrimSpace(lastName),
 		}
-		userCreation, err := newClient().CreateFirstUser(user, whitelistIP)
+		userCreation, err := newDefaultClient().CreateFirstUser(user, whitelistIP)
 
 		exitOnErr(err)
 

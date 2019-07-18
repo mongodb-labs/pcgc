@@ -19,7 +19,7 @@ var listProjectsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List projects",
 	Run: func(cmd *cobra.Command, args []string) {
-		projects, err := newClient().GetAllProjects()
+		projects, err := newAuthenticatedClient().GetAllProjects()
 
 		if err != nil {
 			fmt.Println("Error:", err)
@@ -40,7 +40,7 @@ var createProjectCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		newProject, err := newClient().CreateOneProject(args[0], orgID)
+		newProject, err := newAuthenticatedClient().CreateOneProject(args[0], orgID)
 
 		exitOnErr(err)
 		prettyJSON(newProject)

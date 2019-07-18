@@ -18,7 +18,7 @@ var automationStatusCmd = &cobra.Command{
 	Short: "Automation status",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		automationStatus, err := newClient().GetAutomationStatus(projectID)
+		automationStatus, err := newAuthenticatedClient().GetAutomationStatus(projectID)
 
 		exitOnErr(err)
 
@@ -32,7 +32,7 @@ var automationRetrieveCmd = &cobra.Command{
 	Short: "Automation retrieve",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		automationStatus, err := newClient().GetAutomationConfig(projectID)
+		automationStatus, err := newAuthenticatedClient().GetAutomationConfig(projectID)
 
 		exitOnErr(err)
 
