@@ -23,10 +23,8 @@ var listCmd = &cobra.Command{
 	Short: "List projects",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		withResolver := opsmanager.WithResolver(httpclient.NewURLResolverWithPrefix(viper.GetString("baseURL"), opsmanager.PublicAPIPrefix))
-		withDigestAuth := httpclient.WithDigestAuthentication(viper.GetString("username"), viper.GetString("password"))
-		withHTTPClient := opsmanager.WithHTTPClient(httpclient.NewClient(withDigestAuth))
-		client := opsmanager.NewClient(withResolver, withHTTPClient)
+		resolver := httpclient.NewURLResolverWithPrefix(viper.GetString("baseURL"), opsmanager.PublicAPIPrefix)
+		client := opsmanager.NewClientWithDigestAuth(resolver, viper.GetString("username"), viper.GetString("password"))
 		projects, err := client.GetAllProjects()
 
 		if err != nil {

@@ -24,7 +24,11 @@
 //		useful.PanicOnUnrecoverableError(err)
 //		// do something with _data_
 //
-// To issue authenticated requests, initialize a client using:
+// You can create an authenticated client as follows:
+//		resolver := httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", PublicAPIPrefix)
+//		client:= opsmanager.NewClientWithDigestAuth(resolver, "username", "password")
+//
+// The code above is a simplification of the following (which can be used for a more configurable set-up):
 //		withResolver := opsmanager.WithResolver(httpclient.NewURLResolverWithPrefix("http://OPS-MANAGER-INSTANCE", PublicAPIPrefix))
 //		withDigestAuth := httpclient.WithDigestAuthentication(publicKey, privateKey)
 //		withHTTPClient := opsmanager.WithHTTPClient(httpclient.NewClient(withDigestAuth))
@@ -104,4 +108,14 @@ func WithHTTPClient(basicClient httpclient.BasicClient) func(*opsManagerClient) 
 	return func(client *opsManagerClient) {
 		client.BasicClient = basicClient
 	}
+}
+
+// NewDefaultClient builds a new, unauthenticated, API client with default configurations
+func NewDefaultClient(resolver httpclient.URLResolver) Client {
+	return NewClient(WithHTTPClient(httpclient.NewClient()), WithResolver(resolver))
+}
+
+// NewClientWithDigestAuth builds a new API client with default configurations, which uses digest authentication
+func NewClientWithDigestAuth(resolver httpclient.URLResolver, username string, password string) Client {
+	return NewClient(WithHTTPClient(httpclient.NewClient(httpclient.WithDigestAuthentication(username, password))), WithResolver(resolver))
 }
