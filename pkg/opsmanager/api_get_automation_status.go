@@ -7,12 +7,6 @@ import (
 )
 
 // Process process status
-type Process struct {
-	Hostname                string   `json:"hostname"`
-	Name                    string   `json:"name"`
-	LastGoalVersionAchieved int      `json:"lastGoalVersionAchieved"`
-	Plan                    []string `json:"plan"`
-}
 
 // AutomationStatusResponse automation status
 type AutomationStatusResponse struct {

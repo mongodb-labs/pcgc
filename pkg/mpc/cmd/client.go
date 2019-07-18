@@ -6,9 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-
 func newClient() opsmanager.Client {
-	baseURL := viper.GetString("baseURL")
+	baseURL := viper.GetString("base_url")
 	publicKey := viper.GetString("public_key")
 	privateKey := viper.GetString("private_key")
 	withResolver := opsmanager.WithResolver(httpclient.NewURLResolverWithPrefix(baseURL, opsmanager.PublicAPIPrefix))

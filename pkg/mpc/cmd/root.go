@@ -27,9 +27,8 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		er(err)
-	}
+	err := rootCmd.Execute()
+	exitOnErr(err)
 }
 
 func init() {
@@ -46,13 +45,9 @@ func initConfig() {
 	} else {
 		// Find home directory.
 		home, err := homedir.Dir()
-		if err != nil {
-			er(err)
-		}
+		exitOnErr(err)
 		_, err2 := os.OpenFile(home+"/.mpc.json", os.O_RDONLY|os.O_CREATE, 0600)
-		if err2 != nil {
-			er(err)
-		}
+		exitOnErr(err2)
 
 		viper.SetEnvPrefix("mpc")
 		viper.AutomaticEnv()

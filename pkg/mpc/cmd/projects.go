@@ -37,13 +37,11 @@ var createProjectCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			er("create needs a name for the project")
+			exitOnErr("create needs a name for the project")
 		}
 		newProject, err := newClient().CreateOneProject(args[0], orgID)
 
-		if err != nil {
-			er(err)
-		}
+		exitOnErr(err)
 		prettyJSON(newProject)
 	},
 }

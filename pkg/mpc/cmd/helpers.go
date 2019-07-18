@@ -6,16 +6,15 @@ import (
 	"os"
 )
 
-func er(msg interface{}) {
-	fmt.Println("Error:", msg)
-	os.Exit(1)
+func exitOnErr(msg interface{}) {
+	if msg != nil {
+		fmt.Println("Error:", msg)
+		os.Exit(1)
+	}
 }
 
 func prettyJSON(obj interface{}) {
-	prettyJson, err := json.MarshalIndent(obj, "", "\t")
-	if err != nil {
-		er(err)
-	}
-
-	fmt.Println(string(prettyJson))
+	prettyJSON, err := json.MarshalIndent(obj, "", "\t")
+	exitOnErr(err)
+	fmt.Println(string(prettyJSON))
 }

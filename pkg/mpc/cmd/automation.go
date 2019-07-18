@@ -19,9 +19,7 @@ var automationStatusCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		automationStatus, err := newClient().GetAutomationStatus(projectID)
 
-		if err != nil {
-			er(err)
-		}
+		exitOnErr(err)
 
 		prettyJSON(automationStatus)
 	},
@@ -35,9 +33,7 @@ var automationRetrieveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		automationStatus, err := newClient().GetAutomationConfig(projectID)
 
-		if err != nil {
-			er(err)
-		}
+		exitOnErr(err)
 
 		prettyJSON(automationStatus)
 	},
