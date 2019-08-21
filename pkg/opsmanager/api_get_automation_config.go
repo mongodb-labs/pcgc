@@ -2,15 +2,10 @@ package opsmanager
 
 import (
 	"encoding/json"
+
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 )
-
-// VersionHostnamePair represents a pair of version name and hostname strings
-type VersionHostnamePair struct {
-	Name     string `json:"name"`
-	Hostname string `json:"hostname"`
-}
 
 // Build a MongoDB build
 type Build struct {
@@ -34,31 +29,6 @@ type Build struct {
 type MongoDBVersion struct {
 	Name   string  `json:"name,omitempty"`
 	Builds []Build `json:"builds,omitempty"`
-}
-
-// AutomationConfig represents a cluster definition within an automation config object
-// NOTE: this struct is mutable
-type AutomationConfig struct {
-	Auth               map[string]interface{}   `json:"auth,omitempty"`
-	LDAP               map[string]interface{}   `json:"ldap,omitempty"`
-	Processes          []*Process               `json:"processes,omitempty"`
-	ReplicaSets        []map[string]interface{} `json:"replicaSets,omitempty"`
-	Roles              []map[string]interface{} `json:"roles,omitempty"`
-	MonitoringVersions []*VersionHostnamePair   `json:"monitoringVersions,omitempty"`
-	BackupVersions     []*VersionHostnamePair   `json:"backupVersions,omitempty"`
-	MongoSQLDs         []map[string]interface{} `json:"mongosqlds,omitempty"`
-	MongoDBVersions    []*MongoDBVersion        `json:"mongoDbVersions,omitempty"`
-	AgentVersion       map[string]interface{}   `json:"agentVersion,omitempty"`
-	Balancer           map[string]interface{}   `json:"balancer,omitempty"`
-	CPSModules         []map[string]interface{} `json:"cpsModules,omitempty"`
-	IndexConfigs       []map[string]interface{} `json:"indexConfigs,omitempty"`
-	Kerberos           map[string]interface{}   `json:"kerberos,omitempty"`
-	MongoTs            []map[string]interface{} `json:"mongots,omitempty"`
-	Options            map[string]interface{}   `json:"options,omitempty"`
-	SSL                map[string]interface{}   `json:"ssl,omitempty"`
-	Version            int                      `json:"version,omitempty"`
-	Sharding           []map[string]interface{} `json:"sharding,omitempty"`
-	UIBaseURL          string                   `json:"uiBaseUrl,omitempty"`
 }
 
 // GetAutomationConfig

@@ -1,13 +1,30 @@
 package opsmanager
 
-// Net part of the internal Process struct
-type Net struct {
-	Port int `json:"port,omitempty"`
+// NetSSL defines SSL parameters for Net
+type NetSSL struct {
+	Mode       string `json:"mode"`
+	PEMKeyFile string `json:"PEMKeyFile"`
 }
 
-// Storage part of the internal Process struct
-type Storage struct {
+// Net part of the internal Process struct
+type Net struct {
+	Port int     `json:"port,omitempty"`
+	SSL  *NetSSL `json:"ssl,omitempty"`
+}
+
+// StorageArg part of the internal Process struct
+type StorageArg struct {
 	DBPath string `json:"dbPath,omitempty"`
+}
+
+// ReplicationArg is part of the internal Process struct
+type ReplicationArg struct {
+	ReplSetName string `json:"replSetName"`
+}
+
+// ShardingArg is part of the internal Process struct
+type ShardingArg struct {
+	ClusterRole string `json:"clusterRole"`
 }
 
 // SystemLog part of the internal Process struct
@@ -18,9 +35,11 @@ type SystemLog struct {
 
 // Args26 part of the internal Process struct
 type Args26 struct {
-	NET       *Net       `json:"net,omitempty"`
-	Storage   *Storage   `json:"storage,omitempty"`
-	SystemLog *SystemLog `json:"systemLog,omitempty"`
+	NET         *Net            `json:"net,omitempty"`
+	Storage     *StorageArg     `json:"storage,omitempty"`
+	SystemLog   *SystemLog      `json:"systemLog,omitempty"`
+	Replication *ReplicationArg `json:"replication,omitempty"`
+	Sharding    *ShardingArg    `json:"sharding,omitempty"`
 }
 
 // LogRotate part of the internal Process struct
@@ -43,4 +62,5 @@ type Process struct {
 	LogRotate                   *LogRotate `json:"logRotate,omitempty"`
 	Plan                        []string   `json:"plan,omitempty"`
 	LastGoalVersionAchieved     int        `json:"lastGoalVersionAchieved,omitempty"`
+	Cluster                     string     `json:"cluster,omitempty"`
 }

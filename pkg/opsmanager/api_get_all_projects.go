@@ -2,6 +2,7 @@ package opsmanager
 
 import (
 	"encoding/json"
+
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 )
@@ -17,20 +18,27 @@ type HostCounts struct {
 	Slave     int `json:"slave"`
 }
 
+// LDAPGroupMapping holds a single mapping of role to LDAP groups
+type LDAPGroupMapping struct {
+	RoleName   string   `json:"roleName,omitempty"`
+	LdapGroups []string `json:"ldapGroups,omitempty"`
+}
+
 // ProjectResponse represents the structure of a project
 type ProjectResponse struct {
-	ID               string     `json:"id"`
-	OrgID            string     `json:"orgId"`
-	Name             string     `json:"name"`
-	LastActiveAgent  string     `json:"lastActiveAgent,omitempty"`
-	AgentAPIKey      string     `json:"agentApiKey,omitempty"`
-	ActiveAgentCount int        `json:"activeAgentCount"`
-	HostCounts       HostCounts `json:"hostCounts,omitempty"`
-	PublicAPIEnabled bool       `json:"publicApiEnabled"`
-	ReplicaSetCount  int        `json:"replicaSetCount"`
-	ShardCount       int        `json:"shardCount"`
-	Tags             []string   `json:"tags,omitempty"`
-	Links            []Link     `json:"links,omitempty"`
+	ID                string             `json:"id"`
+	OrgID             string             `json:"orgId"`
+	Name              string             `json:"name"`
+	LastActiveAgent   string             `json:"lastActiveAgent,omitempty"`
+	AgentAPIKey       string             `json:"agentApiKey,omitempty"`
+	ActiveAgentCount  int                `json:"activeAgentCount"`
+	HostCounts        HostCounts         `json:"hostCounts,omitempty"`
+	PublicAPIEnabled  bool               `json:"publicApiEnabled"`
+	ReplicaSetCount   int                `json:"replicaSetCount"`
+	ShardCount        int                `json:"shardCount"`
+	Tags              []string           `json:"tags,omitempty"`
+	Links             []Link             `json:"links,omitempty"`
+	LDAPGroupMappings []LDAPGroupMapping `json:"ldapGroupMappings,omitempty"`
 }
 
 // ProjectsResponse represents a array of project

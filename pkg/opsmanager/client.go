@@ -43,10 +43,11 @@
 package opsmanager
 
 import (
+	"io"
+
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
 	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"github.com/pkg/errors"
-	"io"
 )
 
 type opsManagerClient struct {
@@ -64,7 +65,7 @@ type Client interface {
 	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/get-all-groups-for-current-user/
 	GetAllProjects() (ProjectsResponse, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/create-one-group/
-	CreateOneProject(name string, orgID string) (CreateOneProjectResponse, error)
+	CreateOneProject(name string, orgID string) (ProjectResponse, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#get-the-automation-configuration
 	GetAutomationConfig(projectID string) (AutomationConfig, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/#update-the-automation-configuration
@@ -79,6 +80,20 @@ type Client interface {
 	UpdateDeployments(projectID string, body io.Reader) (map[string]interface{}, error)
 	// https://docs.opsmanager.mongodb.com/master/reference/api/agentapikeys/create-one-agent-api-key/
 	CreateAgentAPIKEY(projectID string, desc string) (CreateAgentAPIKEYResponse, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/get-one-group-by-id/
+	GetProjectByID(projectID string) (ProjectResponse, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/get-one-group-by-name/
+	GetProjectByName(name string) (ProjectResponse, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/delete-one-group/
+	DeleteProject(projectID string) error
+	// https://docs.opsmanager.mongodb.com/master/reference/api/groups/add-or-remove-tags-from-one-group/
+	SetProjectTags(projectID string, tags []string) (ProjectResponse, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/hosts/get-all-hosts-in-group/
+	GetHosts(projectID string) (HostsResponse, error)
+	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/index.html#update-the-monitoring-or-backup
+	UpdateMonitoringConfig(projectID string, config AgentAttributes) error
+	// https://docs.opsmanager.mongodb.com/master/reference/api/automation-config/index.html#update-the-monitoring-or-backup
+	UpdateBackupConfig(projectID string, config AgentAttributes) error
 }
 
 // NewClient builds a new API client for connecting to Ops Manager
