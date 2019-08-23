@@ -11,10 +11,7 @@ func (client opsManagerClient) SetProjectTags(projectID string, tags []string) (
 	var result ProjectResponse
 
 	url := client.resolver.Of("/groups/%s", projectID)
-
-	request := struct {
-		Tags []string `json:"tags,omitempty"`
-	}{tags}
+	request := map[string][]string{"tags": tags}
 
 	body, err := json.Marshal(request)
 	if err != nil {
