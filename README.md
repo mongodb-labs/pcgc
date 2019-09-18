@@ -83,12 +83,3 @@ Ensure `$GOROOT/bin` is in your path.
 2. Install the git hooks, to automatically fix linting issues and flag any errors 
 
 `make link-git-hooks`
-
-### Installing the CLI tool (mpc)
-
-```
-make install # mpc will be deployed into $GOPATH/bin
-
-# Run mpc to see its usage
-mpc
-```

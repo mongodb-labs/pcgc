@@ -41,7 +41,7 @@ test-compile:
 	@echo "==> Compiling test binary..."
 	go test -c $(TEST) $(TESTARGS)
 
-.PHONY: build install test testacc vet fmt fmtcheck errcheck lint test-compile init-git-hooks
+.PHONY: build test testacc vet fmt fmtcheck errcheck lint test-compile init-git-hooks
 
 # Build targets
 clean:
@@ -54,16 +54,11 @@ version=$(shell git describe --exact-match --tags "$(gitsha)" 2>/dev/null)
 ifeq ($(version),)
 	version := $(gitsha)
 endif
-ldflags=-ldflags='-X github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version) -X github.com/mongodb-labs/pcgc/pkg/mpc/cmd.version=$(version)'
+ldflags=-ldflags='-X github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)'
 build: fmtcheck errcheck lint test
 	@echo "==> Building binaries for the current architecture..."
 	mkdir -p out
 	go build $(ldflags) ./...
-	go build $(ldflags) -o out/mpc ./pkg/mpc
-
-install: build
-	@echo "==> Installing pcgc in $(GOPATH)/bin ..."
-	go install $(ldflags) ./pkg/mpc
 
 # GIT hooks
 link-git-hooks:
