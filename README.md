@@ -1,6 +1,8 @@
 MongoDB Private Cloud Golang Client
 ===================================
 
+[![Build Status](https://cloud.drone.io/api/badges/mongodb-labs/pcgc/status.svg)](https://cloud.drone.io/mongodb-labs/pcgc)
+
 An HTTP client for [Ops Manager](https://docs.opsmanager.mongodb.com/master/reference/api/) 
 and [Cloud Manager](https://docs.cloudmanager.mongodb.com/reference/api/) Public API endpoints.
 
