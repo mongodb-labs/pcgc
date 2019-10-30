@@ -75,13 +75,23 @@ Pull requests are always welcome! Please read our [contributor guide](./CONTRIB.
 
 The steps below should help you get started.  They have been tested on MacOS, but should work on Linux systems as well (with minor adaptations.)
 
-1. Install GO (1.12+)
+1. Install GO (1.13+)
 ```
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 ```
 
 Ensure `$GOROOT/bin` is in your path.
 
-2. Install the git hooks, to automatically fix linting issues and flag any errors 
+2. Install the following tools
+
+```
+# GoLint
+go get -u golang.org/x/lint/golint
+
+# Golangci-lint
+curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
+```
+
+3. Install the git hooks, to automatically fix linting issues and flag any errors
 
 `make link-git-hooks`
