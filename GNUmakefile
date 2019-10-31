@@ -10,8 +10,8 @@ test: fmtcheck
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
 vet:
-	@echo "go vet ."
-	@go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 1 ]; then \
+	@echo "==> go vet"
+	go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 1 ]; then \
 		echo ""; \
 		echo "Vet found suspicious constructs. Please check the reported constructs"; \
 		echo "and fix them if necessary before submitting the code for review."; \
@@ -55,7 +55,7 @@ ifeq ($(version),)
 	version := $(gitsha)
 endif
 ldflags=-ldflags='-X github.com/mongodb-labs/pcgc/pkg/httpclient.version=$(version)'
-build: fmtcheck errcheck lint test
+build: fmtcheck errcheck lint vet test
 	@echo "==> Building binaries for the current architecture..."
 	mkdir -p out
 	go build $(ldflags) ./...
