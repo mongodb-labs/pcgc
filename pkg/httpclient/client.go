@@ -24,7 +24,6 @@ package httpclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"gopkg.in/errgo.v1"
 	"io"
 	"net"
@@ -33,6 +32,7 @@ import (
 	"strings"
 
 	"github.com/Sectorbob/mlab-ns2/gae/ns/digest"
+	"github.com/mongodb-labs/pcgc/pkg/useful"
 )
 
 const (

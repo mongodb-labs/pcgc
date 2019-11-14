@@ -43,11 +43,11 @@
 package opsmanager
 
 import (
+	"errors"
 	"io"
 
 	"github.com/mongodb-labs/pcgc/pkg/httpclient"
 	"github.com/mongodb-labs/pcgc/pkg/useful"
-	"github.com/pkg/errors"
 )
 
 type opsManagerClient struct {
