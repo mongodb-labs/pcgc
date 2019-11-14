@@ -24,12 +24,13 @@ package httpclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Sectorbob/mlab-ns2/gae/ns/digest"
-	"github.com/mongodb-labs/pcgc/pkg/useful"
 	"io"
 	"net"
 	"net/http"
 	"runtime"
+
+	"github.com/Sectorbob/mlab-ns2/gae/ns/digest"
+	"github.com/mongodb-labs/pcgc/pkg/useful"
 )
 
 const (
