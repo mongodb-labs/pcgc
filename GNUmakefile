@@ -17,7 +17,6 @@ test:
 
 lint:
 	@echo "==> Linting all packages..."
-	golint -set_exit_status ./...
 	golangci-lint run ./... -E gofmt -E golint
 .PHONY: lint
 
