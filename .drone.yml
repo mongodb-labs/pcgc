@@ -1,19 +1,35 @@
 ---
 kind: pipeline
 type: docker
-name: linux-amd64
+name: pcgc
 
 platform:
   arch: amd64
   os: linux
 
 steps:
-  - name: build
-    image: golang:1.13.3-buster
+  - name: test
+    image: golang:1.13
+    volumes:
+      - name: deps
+        path: /go
     commands:
-      - go get -u golang.org/x/lint/golint
-      - curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
-      - make clean build
+      - make test
+  - name: lint
+    image: golangci/golangci-lint:v1.21.0
+    commands:
+      - make lint
+  - name: build
+    image: golang:1.13
+    volumes:
+      - name: deps
+        path: /go
+    commands:
+      - make build
+
+volumes:
+  - name: deps
+    temp: {}
 
 trigger:
   branch:

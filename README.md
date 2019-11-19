@@ -82,14 +82,12 @@ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 Ensure `$GOROOT/bin` is in your path.
 
-2. Install the following tools
+2. Install the linting tools
 
 ```
 # GoLint
-go get -u golang.org/x/lint/golint
+make setup
 
-# Golangci-lint
-curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
 ```
 
 3. Install the git hooks, to automatically fix linting issues and flag any errors
