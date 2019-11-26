@@ -6,7 +6,7 @@ default: build
 
 .PHONY: setup
 setup:
-    @echo "==> Installing dependencies..."
+	@echo "==> Installing dependencies..."
     curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.21.0
 
 .PHONY: test
