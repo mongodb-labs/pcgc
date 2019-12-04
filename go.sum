@@ -1,2 +1,16 @@
 github.com/Sectorbob/mlab-ns2 v0.0.0-20171030222938-d3aa0c295a8a h1:KFHLI4QGttB0i7M3qOkAo8Zn/GSsxwwCnInFqBaYtkM=
 github.com/Sectorbob/mlab-ns2 v0.0.0-20171030222938-d3aa0c295a8a/go.mod h1:D73UAuEPckrDorYZdtlCu2ySOLuPB5W4rhIkmmc/XbI=
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/go-test/deep v1.0.1 h1:UQhStjbkDClarlmv0am7OXXO4/GaPdCGiUiMTvi28sg=
+github.com/go-test/deep v1.0.1/go.mod h1:wGDj63lr65AM2AQyKZd/NYHGb0R+1RLqB8NKt3aSFNA=
+github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASuANWTrk=
+github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
+github.com/mongodb/go-client-mongodb-atlas v0.1.1 h1:L7eaGSvw1raCQF69N/tlYWAyyJRIJpdyqK6d90BtQ74=
+github.com/mongodb/go-client-mongodb-atlas v0.1.1/go.mod h1:LS8O0YLkA+sbtOb3fZLF10yY3tJM+1xATXMJ3oU35LU=
+github.com/mwielbut/pointy v1.1.0 h1:U5/YEfoIkaGCHv0St3CgjduqXID4FNRoyZgLM1kY9vg=
+github.com/mwielbut/pointy v1.1.0/go.mod h1:MvvO+uMFj9T5DMda33HlvogsFBX7pWWKAkFIn4teYwY=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
+github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
