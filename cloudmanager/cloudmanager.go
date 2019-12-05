@@ -15,12 +15,12 @@ import (
 	"github.com/mongodb/go-client-mongodb-atlas/mongodbatlas"
 )
 
-// Version for client
-// DefaultBaseURL API default base URL
-// DefaultUserAgent To be submitted by the client
 const (
-	Version          = "0.1"
-	DefaultBaseURL   = "https://cloud.mongodb.com/api/public/v1.0/"
+	// Version for client
+	Version = "0.1"
+	// DefaultBaseURL API default base URL
+	DefaultBaseURL = "https://cloud.mongodb.com/api/public/v1.0/"
+	// DefaultUserAgent To be submitted by the client
 	DefaultUserAgent = "pcgc/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 	mediaType        = "application/json"
 )
@@ -39,7 +39,8 @@ type Client struct {
 // RequestCompletionCallback defines the type of the request callback function
 type RequestCompletionCallback func(*http.Request, *http.Response)
 
-// Response is a MongoDBAtlas response. This wraps the standard http.Response returned from MongoDBAtlas API.
+// Response is a Cloud Manager API response.
+// This wraps the standard http.Response returned from a Cloud Manager API.
 type Response struct {
 	*http.Response
 
@@ -57,16 +58,14 @@ type ListOptions struct {
 	ItemsPerPage int `url:"itemsPerPage,omitempty"`
 }
 
-//ErrorResponse reports the error caused by an API request.
+// ErrorResponse reports the error caused by an API request.
 type ErrorResponse struct {
 	// HTTP response that caused this error
 	Response *http.Response
-	//The error code, which is simply the HTTP status code.
+	// The error code, which is simply the HTTP status code.
 	ErrorCode int `json:"Error"`
-
-	//A short description of the error, which is simply the HTTP status phrase.
+	// A short description of the error, which is simply the HTTP status phrase.
 	Reason string `json:"reason"`
-
 	//A more detailed description of the error.
 	Detail string `json:"detail,omitempty"`
 }
