@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mongodb/go-client-mongodb-atlas/mongodbatlas"
+	atlas "github.com/mongodb/go-client-mongodb-atlas/mongodbatlas"
 )
 
 const (
@@ -16,11 +16,11 @@ const (
 // endpoints of the MongoDB Atlas API.
 // See more: https://docs.atlas.mongodb.com/reference/api/projects/
 type ProjectsService interface {
-	GetAllProjects(context.Context) (*Projects, *Response, error)
-	GetOneProject(context.Context, string) (*Project, *Response, error)
-	GetOneProjectByName(context.Context, string) (*Project, *Response, error)
-	Create(context.Context, *Project) (*Project, *Response, error)
-	Delete(context.Context, string) (*Response, error)
+	GetAllProjects(context.Context) (*Projects, *atlas.Response, error)
+	GetOneProject(context.Context, string) (*Project, *atlas.Response, error)
+	GetOneProjectByName(context.Context, string) (*Project, *atlas.Response, error)
+	Create(context.Context, *Project) (*Project, *atlas.Response, error)
+	Delete(context.Context, string) (*atlas.Response, error)
 }
 
 //ProjectsServiceOp handles communication with the Projects related methos of the
@@ -44,29 +44,29 @@ type HostCount struct {
 
 // Project represents the structure of a project.
 type Project struct {
-	ActiveAgentCount int                  `json:"activeAgentCount,omitempty"`
-	HostCounts       *HostCount           `json:"hostCounts,omitempty"`
-	ID               string               `json:"id,omitempty"`
-	LastActiveAgent  string               `json:"lastActiveAgent,omitempty"`
-	Links            []*mongodbatlas.Link `json:"links,omitempty"`
-	Name             string               `json:"name,omitempty"`
-	OrgID            string               `json:"orgId,omitempty"`
-	PublicAPIEnabled bool                 `json:"publicApiEnabled,omitempty"`
-	ReplicaSetCount  int                  `json:"replicaSetCount,omitempty"`
-	ShardCount       int                  `json:"shardCount,omitempty"`
-	Tags             []*string            `json:"tags,omitempty"`
+	ActiveAgentCount int           `json:"activeAgentCount,omitempty"`
+	HostCounts       *HostCount    `json:"hostCounts,omitempty"`
+	ID               string        `json:"id,omitempty"`
+	LastActiveAgent  string        `json:"lastActiveAgent,omitempty"`
+	Links            []*atlas.Link `json:"links,omitempty"`
+	Name             string        `json:"name,omitempty"`
+	OrgID            string        `json:"orgId,omitempty"`
+	PublicAPIEnabled bool          `json:"publicApiEnabled,omitempty"`
+	ReplicaSetCount  int           `json:"replicaSetCount,omitempty"`
+	ShardCount       int           `json:"shardCount,omitempty"`
+	Tags             []*string     `json:"tags,omitempty"`
 }
 
 // Projects represents a array of project
 type Projects struct {
-	Links      []*mongodbatlas.Link `json:"links"`
-	Results    []*Project           `json:"results"`
-	TotalCount int                  `json:"totalCount"`
+	Links      []*atlas.Link `json:"links"`
+	Results    []*Project    `json:"results"`
+	TotalCount int           `json:"totalCount"`
 }
 
 //GetAllProjects gets all project.
 //See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-all-groups-for-current-user/
-func (s *ProjectsServiceOp) GetAllProjects(ctx context.Context) (*Projects, *Response, error) {
+func (s *ProjectsServiceOp) GetAllProjects(ctx context.Context) (*Projects, *atlas.Response, error) {
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, projectBasePath, nil)
 	if err != nil {
@@ -88,9 +88,9 @@ func (s *ProjectsServiceOp) GetAllProjects(ctx context.Context) (*Projects, *Res
 
 //GetOneProject gets a single project.
 //See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-one-group-by-id/
-func (s *ProjectsServiceOp) GetOneProject(ctx context.Context, projectID string) (*Project, *Response, error) {
+func (s *ProjectsServiceOp) GetOneProject(ctx context.Context, projectID string) (*Project, *atlas.Response, error) {
 	if projectID == "" {
-		return nil, nil, mongodbatlas.NewArgError("projectID", "must be set")
+		return nil, nil, atlas.NewArgError("projectID", "must be set")
 	}
 
 	path := fmt.Sprintf("%s/%s", projectBasePath, projectID)
@@ -111,9 +111,9 @@ func (s *ProjectsServiceOp) GetOneProject(ctx context.Context, projectID string)
 
 //GetOneProjectByName gets a single project by its name.
 //See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-one-group-by-name/
-func (s *ProjectsServiceOp) GetOneProjectByName(ctx context.Context, projectName string) (*Project, *Response, error) {
+func (s *ProjectsServiceOp) GetOneProjectByName(ctx context.Context, projectName string) (*Project, *atlas.Response, error) {
 	if projectName == "" {
-		return nil, nil, mongodbatlas.NewArgError("projectName", "must be set")
+		return nil, nil, atlas.NewArgError("projectName", "must be set")
 	}
 
 	path := fmt.Sprintf("%s/byName/%s", projectBasePath, projectName)
@@ -134,9 +134,9 @@ func (s *ProjectsServiceOp) GetOneProjectByName(ctx context.Context, projectName
 
 //Create creates a project.
 //See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/create-one-group/
-func (s *ProjectsServiceOp) Create(ctx context.Context, createRequest *Project) (*Project, *Response, error) {
+func (s *ProjectsServiceOp) Create(ctx context.Context, createRequest *Project) (*Project, *atlas.Response, error) {
 	if createRequest == nil {
-		return nil, nil, mongodbatlas.NewArgError("createRequest", "cannot be nil")
+		return nil, nil, atlas.NewArgError("createRequest", "cannot be nil")
 	}
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, projectBasePath, createRequest)
@@ -155,9 +155,9 @@ func (s *ProjectsServiceOp) Create(ctx context.Context, createRequest *Project) 
 
 //Delete deletes a project.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/delete-one-group/
-func (s *ProjectsServiceOp) Delete(ctx context.Context, projectID string) (*Response, error) {
+func (s *ProjectsServiceOp) Delete(ctx context.Context, projectID string) (*atlas.Response, error) {
 	if projectID == "" {
-		return nil, mongodbatlas.NewArgError("projectID", "must be set")
+		return nil, atlas.NewArgError("projectID", "must be set")
 	}
 
 	basePath := fmt.Sprintf("%s/%s", projectBasePath, projectID)

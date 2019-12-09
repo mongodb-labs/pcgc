@@ -204,59 +204,6 @@ func TestDo_redirectLoop(t *testing.T) {
 	}
 }
 
-func TestCheckResponse(t *testing.T) {
-	res := &http.Response{
-		Request:    &http.Request{},
-		StatusCode: http.StatusBadRequest,
-		Body:       ioutil.NopCloser(strings.NewReader(`{"error":400, "reason":"r", "detail":"d"}`)),
-	}
-	err := CheckResponse(res).(*ErrorResponse)
-
-	if err == nil {
-		t.Fatalf("Expected error response.")
-	}
-
-	expected := &ErrorResponse{
-		Response:  res,
-		ErrorCode: 400,
-		Reason:    "r",
-		Detail:    "d",
-	}
-	if !reflect.DeepEqual(err, expected) {
-		t.Errorf("Error = %#v, expected %#v", err, expected)
-	}
-}
-
-// ensure that we properly handle API errors that do not contain a response
-// body
-func TestCheckResponse_noBody(t *testing.T) {
-	res := &http.Response{
-		Request:    &http.Request{},
-		StatusCode: http.StatusBadRequest,
-		Body:       ioutil.NopCloser(strings.NewReader("")),
-	}
-	err := CheckResponse(res).(*ErrorResponse)
-
-	if err == nil {
-		t.Errorf("Expected error response.")
-	}
-
-	expected := &ErrorResponse{
-		Response: res,
-	}
-	if !reflect.DeepEqual(err, expected) {
-		t.Errorf("Error = %#v, expected %#v", err, expected)
-	}
-}
-
-func TestErrorResponse_Error(t *testing.T) {
-	res := &http.Response{Request: &http.Request{}}
-	err := ErrorResponse{Reason: "m", Response: res}
-	if err.Error() == "" {
-		t.Errorf("Expected non-empty ErrorResponse.Error()")
-	}
-}
-
 func TestDo_completion_callback(t *testing.T) {
 	setup()
 	defer teardown()

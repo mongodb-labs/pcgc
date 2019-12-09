@@ -2,12 +2,12 @@ package cloudmanager
 
 import (
 	"fmt"
-	"github.com/mongodb/go-client-mongodb-atlas/mongodbatlas"
 	"net/http"
 	"reflect"
 	"testing"
 
 	"github.com/go-test/deep"
+	"github.com/mongodb/go-client-mongodb-atlas/mongodbatlas"
 )
 
 func TestProject_GetAllProjects(t *testing.T) {
