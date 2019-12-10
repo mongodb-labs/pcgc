@@ -1,4 +1,6 @@
 export GO111MODULE := on
+export PATH := ./bin:$(PATH)
+
 TEST?=$$(go list ./...)
 GOFMT_FILES?=$$(find . -name '*.go')
 
@@ -7,7 +9,8 @@ default: build
 .PHONY: setup
 setup:
 	@echo "==> Installing dependencies..."
-    curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.21.0
+	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.21.0
+	go get -u github.com/google/addlicense
 
 .PHONY: test
 test:
@@ -23,7 +26,11 @@ lint:
 
 .PHONY: fmt
 fmt:
-	gofmt -s -w $(GOFMT_FILES)
+	gofmt -s -w $(GOFMT_FILES); goimports -w $(GOFMT_FILES)
+
+.PHONY: addlicense
+addlicense:
+	addlicense -c "MongoDB Inc" $(GOFMT_FILES)
 
 .PHONY: test-compile
 test-compile:
