@@ -3,13 +3,14 @@ export PATH := ./bin:$(PATH)
 
 TEST?=$$(go list ./...)
 GOFMT_FILES?=$$(find . -name '*.go')
+GOLANGCI_VERSION=v1.22.2
 
 default: build
 
 .PHONY: setup
 setup:
 	@echo "==> Installing dependencies..."
-	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.21.0
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s $(GOLANGCI_VERSION)
 	go get -u github.com/google/addlicense
 
 .PHONY: test
@@ -22,7 +23,7 @@ test:
 .PHONY: lint
 lint:
 	@echo "==> Linting all packages..."
-	golangci-lint run ./... -E gofmt -E golint
+	golangci-lint run ./... -E gofmt -E golint -E misspell
 
 .PHONY: fmt
 fmt:
