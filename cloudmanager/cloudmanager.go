@@ -30,8 +30,10 @@ import (
 const (
 	// Version for client
 	Version = "0.1"
-	// DefaultBaseURL API default base URL
-	DefaultBaseURL = "https://cloud.mongodb.com/api/public/v1.0/"
+	// DefaultBaseURL API default base URL for cloud manager
+	DefaultBaseURL = "https://cloud.mongodb.com" + APIPublicV1Path
+	// DefaultAPIPath default root path for all API endpoints
+	APIPublicV1Path = "/api/public/v1.0/"
 	// DefaultUserAgent To be submitted by the client
 	DefaultUserAgent = "pcgc/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 	mediaType        = "application/json"
@@ -43,7 +45,8 @@ type Client struct {
 	BaseURL   *url.URL
 	UserAgent string
 
-	Projects ProjectsService
+	Projects         ProjectsService
+	AutomationConfig AutomationService
 
 	onRequestCompleted RequestCompletionCallback
 }
@@ -59,9 +62,14 @@ func NewClient(httpClient *http.Client) *Client {
 
 	baseURL, _ := url.Parse(DefaultBaseURL)
 
-	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: DefaultUserAgent}
+	c := &Client{
+		client:    httpClient,
+		BaseURL:   baseURL,
+		UserAgent: DefaultUserAgent,
+	}
 
 	c.Projects = &ProjectsServiceOp{client: c}
+	c.AutomationConfig = &AutomationServiceOp{client: c}
 
 	return c
 }
