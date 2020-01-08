@@ -61,7 +61,7 @@ func (s *AutomationServiceOp) Get(ctx context.Context, groupID string) (*Automat
 func (s *AutomationServiceOp) Update(ctx context.Context, groupID string, updateRequest *AutomationConfig) (*AutomationConfig, *atlas.Response, error) {
 	basePath := fmt.Sprintf(automationBasePath, groupID)
 
-	req, err := s.client.NewRequest(ctx, http.MethodPatch, basePath, updateRequest)
+	req, err := s.client.NewRequest(ctx, http.MethodPut, basePath, updateRequest)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -79,7 +79,7 @@ var _ AutomationService = new(AutomationServiceOp)
 
 type AutomationConfig struct {
 	AgentVersion       *map[string]interface{}   `json:"agentVersion,omitempty"`
-	Auth               *Auth                     `json:"auth,omitempty"`
+	Auth               Auth                      `json:"auth"`
 	BackupVersions     []*map[string]interface{} `json:"backupVersions,omitempty"`
 	Balancer           *map[string]interface{}   `json:"balancer,omitempty"`
 	CPSModules         []*map[string]interface{} `json:"cpsModules,omitempty"`
@@ -102,9 +102,9 @@ type AutomationConfig struct {
 
 // SSL ssl config properties
 type SSL struct {
-	AutoPEMKeyFilePath    string `json:"autoPEMKeyFilePath"`
-	CAFilePath            string `json:"CAFilePath"`
-	ClientCertificateMode string `json:"clientCertificateMode"`
+	AutoPEMKeyFilePath    string `json:"autoPEMKeyFilePath,omitempty"`
+	CAFilePath            string `json:"CAFilePath,omitempty"`
+	ClientCertificateMode string `json:"clientCertificateMode,omitempty"`
 }
 
 // Auth authentication config
@@ -181,11 +181,11 @@ type SystemLog struct {
 
 // Args26 part of the internal Process struct
 type Args26 struct {
-	NET         Net         `json:"net,omitempty"`
-	Replication Replication `json:"replication,omitempty"`
-	Sharding    Sharding    `json:"sharding,omitempty"`
-	Storage     Storage     `json:"storage,omitempty"`
-	SystemLog   SystemLog   `json:"systemLog,omitempty"`
+	NET         Net          `json:"net"`
+	Replication *Replication `json:"replication,omitempty"`
+	Sharding    *Sharding    `json:"sharding,omitempty"`
+	Storage     Storage      `json:"storage"`
+	SystemLog   SystemLog    `json:"systemLog"`
 }
 
 // LogRotate part of the internal Process struct

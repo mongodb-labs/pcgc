@@ -15,21 +15,14 @@
 package cloudmanager
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
 )
 
-func TestAutomationConfig_Get(t *testing.T) {
-	setup()
-	defer teardown()
-
-	projectID := "5a0a1e7e0f2912c554080adc"
-
-	mux.HandleFunc(fmt.Sprintf("/groups/%s/automationConfig", projectID), func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodGet)
-		_, _ = fmt.Fprint(w, `{
+const jsonBlob = `{
   "auth" : {
     "authoritativeSet" : false,
     "autoAuthMechanism" : "MONGODB-CR",
@@ -176,7 +169,17 @@ func TestAutomationConfig_Get(t *testing.T) {
   } ],
   "uiBaseUrl" : null,
   "version" : 1
-}`)
+}`
+
+func TestAutomationConfig_Get(t *testing.T) {
+	setup()
+	defer teardown()
+
+	projectID := "5a0a1e7e0f2912c554080adc"
+
+	mux.HandleFunc(fmt.Sprintf("/groups/%s/automationConfig", projectID), func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodGet)
+		_, _ = fmt.Fprint(w, jsonBlob)
 	})
 
 	config, _, err := client.AutomationConfig.Get(ctx, projectID)
@@ -185,7 +188,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 	}
 
 	expected := &AutomationConfig{
-		Auth: &Auth{
+		Auth: Auth{
 			AutoAuthMechanism: "MONGODB-CR",
 			Disabled:          true,
 			AuthoritativeSet:  false,
@@ -211,7 +214,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 						Destination: "file",
 						Path:        "/data/rs1/mongodb.log",
 					},
-					Replication: Replication{
+					Replication: &Replication{
 						ReplSetName: "myReplicaSet",
 					},
 				},
@@ -242,7 +245,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 						Destination: "file",
 						Path:        "/data/rs2/mongodb.log",
 					},
-					Replication: Replication{
+					Replication: &Replication{
 						ReplSetName: "myReplicaSet",
 					},
 				},
@@ -273,7 +276,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 						Destination: "file",
 						Path:        "/data/rs3/mongodb.log",
 					},
-					Replication: Replication{
+					Replication: &Replication{
 						ReplSetName: "myReplicaSet",
 					},
 				},
@@ -323,11 +326,177 @@ func TestAutomationConfig_Get(t *testing.T) {
 				},
 			},
 		},
-		Version:   1,
-		UIBaseURL: "",
+		Version: 1,
 	}
 
 	if !reflect.DeepEqual(config, expected) {
 		t.Errorf("AutomationConfig.Get\n got=%#v\nwant=%#v", config, expected)
+	}
+}
+
+func TestAutomationConfig_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	projectID := "5a0a1e7e0f2912c554080adc"
+	clusterName := "myReplicaSet"
+	updateRequest := &AutomationConfig{
+		Auth: Auth{
+			AutoAuthMechanism: "MONGODB-CR",
+			Disabled:          true,
+			AuthoritativeSet:  false,
+		},
+		Processes: []*Process{
+			{
+				Name:                        "myReplicaSet_1",
+				ProcessType:                 "mongod",
+				Version:                     "4.2.2",
+				AuthSchemaVersion:           5,
+				FeatureCompatibilityVersion: "4.2",
+				Disabled:                    false,
+				ManualMode:                  false,
+				Hostname:                    "host0",
+				Args26: Args26{
+					NET: Net{
+						Port: 27000,
+					},
+					Storage: Storage{
+						DBPath: "/data/rs1",
+					},
+					SystemLog: SystemLog{
+						Destination: "file",
+						Path:        "/data/rs1/mongodb.log",
+					},
+					Replication: &Replication{
+						ReplSetName: "myReplicaSet",
+					},
+				},
+				LogRotate: &LogRotate{
+					SizeThresholdMB:  1000.0,
+					TimeThresholdHrs: 24,
+				},
+				LastGoalVersionAchieved: 0,
+				Cluster:                 "",
+			},
+			{
+				Name:                        "myReplicaSet_2",
+				ProcessType:                 "mongod",
+				Version:                     "4.2.2",
+				AuthSchemaVersion:           5,
+				FeatureCompatibilityVersion: "4.2",
+				Disabled:                    false,
+				ManualMode:                  false,
+				Hostname:                    "host1",
+				Args26: Args26{
+					NET: Net{
+						Port: 27010,
+					},
+					Storage: Storage{
+						DBPath: "/data/rs2",
+					},
+					SystemLog: SystemLog{
+						Destination: "file",
+						Path:        "/data/rs2/mongodb.log",
+					},
+					Replication: &Replication{
+						ReplSetName: clusterName,
+					},
+				},
+				LogRotate: &LogRotate{
+					SizeThresholdMB:  1000.0,
+					TimeThresholdHrs: 24,
+				},
+				LastGoalVersionAchieved: 0,
+				Cluster:                 "",
+			},
+			{
+				Name:                        "myReplicaSet_3",
+				ProcessType:                 "mongod",
+				Version:                     "4.2.2",
+				AuthSchemaVersion:           5,
+				FeatureCompatibilityVersion: "4.2",
+				Disabled:                    false,
+				ManualMode:                  false,
+				Hostname:                    "host0",
+				Args26: Args26{
+					NET: Net{
+						Port: 27020,
+					},
+					Storage: Storage{
+						DBPath: "/data/rs3",
+					},
+					SystemLog: SystemLog{
+						Destination: "file",
+						Path:        "/data/rs3/mongodb.log",
+					},
+					Replication: &Replication{
+						ReplSetName: clusterName,
+					},
+				},
+				LogRotate: &LogRotate{
+					SizeThresholdMB:  1000.0,
+					TimeThresholdHrs: 24,
+				},
+				LastGoalVersionAchieved: 0,
+			},
+		},
+		ReplicaSets: []*ReplicaSet{
+			{
+				ID:              clusterName,
+				ProtocolVersion: "1",
+				Members: []Member{
+					{
+						ID:           0,
+						ArbiterOnly:  false,
+						BuildIndexes: true,
+						Hidden:       false,
+						Host:         "myReplicaSet_1",
+						Priority:     1,
+						SlaveDelay:   0,
+						Votes:        1,
+					},
+					{
+						ID:           1,
+						ArbiterOnly:  false,
+						BuildIndexes: true,
+						Hidden:       false,
+						Host:         "myReplicaSet_2",
+						Priority:     1,
+						SlaveDelay:   0,
+						Votes:        1,
+					},
+					{
+						ID:           2,
+						ArbiterOnly:  false,
+						BuildIndexes: true,
+						Hidden:       false,
+						Host:         "myReplicaSet_3",
+						Priority:     1,
+						SlaveDelay:   0,
+						Votes:        1,
+					},
+				},
+			},
+		},
+		Version: 1,
+	}
+
+	mux.HandleFunc(fmt.Sprintf("/groups/%s/automationConfig", projectID), func(w http.ResponseWriter, r *http.Request) {
+		var v map[string]interface{}
+		err := json.NewDecoder(r.Body).Decode(&v)
+		if err != nil {
+			t.Fatalf("decode json: %v", err)
+		}
+
+		_, _ = fmt.Fprint(w, jsonBlob)
+	})
+
+	config, _, err := client.AutomationConfig.Update(ctx, projectID, updateRequest)
+	if err != nil {
+		t.Errorf("AutomationConfig.Update returned error: %v", err)
+	}
+
+	if name := config.ReplicaSets[0].ID; name != clusterName {
+		t.Errorf("expected name '%s', received '%s'", clusterName, name)
 	}
 }
