@@ -181,11 +181,11 @@ type SystemLog struct {
 
 // Args26 part of the internal Process struct
 type Args26 struct {
-	NET         Net          `json:"net"`
-	Replication *Replication `json:"replication,omitempty"`
-	Sharding    *Sharding    `json:"sharding,omitempty"`
-	Storage     Storage      `json:"storage"`
-	SystemLog   SystemLog    `json:"systemLog"`
+	NET         Net          `json:"net"`                   // NET configuration for db connection (ports)
+	Replication *Replication `json:"replication,omitempty"` // Replication configuration for ReplicaSets, omit this field if setting Sharding
+	Sharding    *Sharding    `json:"sharding,omitempty"`    // Replication configuration for sharded clusters, omit this field if setting Replication
+	Storage     Storage      `json:"storage"`               // Storage configuration for dbpath
+	SystemLog   SystemLog    `json:"systemLog"`             // SystemLog configuration for the dblog
 }
 
 // LogRotate part of the internal Process struct
