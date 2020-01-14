@@ -207,7 +207,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 					NET: Net{
 						Port: 27000,
 					},
-					Storage: Storage{
+					Storage: &Storage{
 						DBPath: "/data/rs1",
 					},
 					SystemLog: SystemLog{
@@ -238,7 +238,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 					NET: Net{
 						Port: 27010,
 					},
-					Storage: Storage{
+					Storage: &Storage{
 						DBPath: "/data/rs2",
 					},
 					SystemLog: SystemLog{
@@ -269,7 +269,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 					NET: Net{
 						Port: 27020,
 					},
-					Storage: Storage{
+					Storage: &Storage{
 						DBPath: "/data/rs3",
 					},
 					SystemLog: SystemLog{
@@ -360,7 +360,7 @@ func TestAutomationConfig_Update(t *testing.T) {
 					NET: Net{
 						Port: 27000,
 					},
-					Storage: Storage{
+					Storage: &Storage{
 						DBPath: "/data/rs1",
 					},
 					SystemLog: SystemLog{
@@ -391,7 +391,7 @@ func TestAutomationConfig_Update(t *testing.T) {
 					NET: Net{
 						Port: 27010,
 					},
-					Storage: Storage{
+					Storage: &Storage{
 						DBPath: "/data/rs2",
 					},
 					SystemLog: SystemLog{
@@ -422,7 +422,7 @@ func TestAutomationConfig_Update(t *testing.T) {
 					NET: Net{
 						Port: 27020,
 					},
-					Storage: Storage{
+					Storage: &Storage{
 						DBPath: "/data/rs3",
 					},
 					SystemLog: SystemLog{
@@ -488,15 +488,11 @@ func TestAutomationConfig_Update(t *testing.T) {
 			t.Fatalf("decode json: %v", err)
 		}
 
-		_, _ = fmt.Fprint(w, jsonBlob)
+		_, _ = fmt.Fprint(w, `{}`)
 	})
 
-	config, _, err := client.AutomationConfig.Update(ctx, projectID, updateRequest)
+	_, err := client.AutomationConfig.Update(ctx, projectID, updateRequest)
 	if err != nil {
 		t.Errorf("AutomationConfig.Update returned error: %v", err)
-	}
-
-	if name := config.ReplicaSets[0].ID; name != clusterName {
-		t.Errorf("expected name '%s', received '%s'", clusterName, name)
 	}
 }

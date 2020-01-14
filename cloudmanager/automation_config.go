@@ -31,7 +31,7 @@ const (
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/automation-config/
 type AutomationService interface {
 	Get(context.Context, string) (*AutomationConfig, *atlas.Response, error)
-	Update(context.Context, string, *AutomationConfig) (*AutomationConfig, *atlas.Response, error)
+	Update(context.Context, string, *AutomationConfig) (*atlas.Response, error)
 }
 
 // AutomationServiceOp handles communication with the Automation config related methods of the MongoDB Cloud API
@@ -58,21 +58,17 @@ func (s *AutomationServiceOp) Get(ctx context.Context, groupID string) (*Automat
 }
 
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/automation-config/#update-the-automation-configuration
-func (s *AutomationServiceOp) Update(ctx context.Context, groupID string, updateRequest *AutomationConfig) (*AutomationConfig, *atlas.Response, error) {
+func (s *AutomationServiceOp) Update(ctx context.Context, groupID string, updateRequest *AutomationConfig) (*atlas.Response, error) {
 	basePath := fmt.Sprintf(automationBasePath, groupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, basePath, updateRequest)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	root := new(AutomationConfig)
-	resp, err := s.client.Do(ctx, req, root)
-	if err != nil {
-		return nil, resp, err
-	}
+	resp, err := s.client.Do(ctx, req, nil)
 
-	return root, resp, err
+	return resp, err
 }
 
 var _ AutomationService = new(AutomationServiceOp)
@@ -165,7 +161,7 @@ type Storage struct {
 
 // Replication is part of the internal Process struct
 type Replication struct {
-	ReplSetName string `json:"replSetName"`
+	ReplSetName string `json:"replSetName,omitempty"`
 }
 
 // Sharding is part of the internal Process struct
@@ -184,7 +180,7 @@ type Args26 struct {
 	NET         Net          `json:"net"`                   // NET configuration for db connection (ports)
 	Replication *Replication `json:"replication,omitempty"` // Replication configuration for ReplicaSets, omit this field if setting Sharding
 	Sharding    *Sharding    `json:"sharding,omitempty"`    // Replication configuration for sharded clusters, omit this field if setting Replication
-	Storage     Storage      `json:"storage"`               // Storage configuration for dbpath
+	Storage     *Storage     `json:"storage,omitempty"`     // Storage configuration for dbpath
 	SystemLog   SystemLog    `json:"systemLog"`             // SystemLog configuration for the dblog
 }
 
