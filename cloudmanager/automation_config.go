@@ -180,7 +180,7 @@ type Args26 struct {
 	NET         Net          `json:"net"`                   // NET configuration for db connection (ports)
 	Replication *Replication `json:"replication,omitempty"` // Replication configuration for ReplicaSets, omit this field if setting Sharding
 	Sharding    *Sharding    `json:"sharding,omitempty"`    // Replication configuration for sharded clusters, omit this field if setting Replication
-	Storage     *Storage     `json:"storage,omitempty"`     // Storage configuration for dbpath
+	Storage     *Storage     `json:"storage,omitempty"`     // Storage configuration for dbpath, config servers don't define this
 	SystemLog   SystemLog    `json:"systemLog"`             // SystemLog configuration for the dblog
 }
 
