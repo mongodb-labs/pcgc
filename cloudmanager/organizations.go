@@ -35,7 +35,7 @@ type OrganizationsService interface {
 	GetProjects(context.Context, string) (*Projects, *atlas.Response, error)
 }
 
-// OrganizationsServiceOp handles communication with the Projects related methos of the
+// OrganizationsServiceOp handles communication with the Projects related methods of the
 // MongoDB Atlas API
 type OrganizationsServiceOp struct {
 	client *Client
@@ -57,7 +57,7 @@ type Organizations struct {
 	TotalCount int             `json:"totalCount"`
 }
 
-// GetAllOrganizations gets all project.
+// GetAllOrganizations gets all organizations.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/organizations/organization-get-all/
 func (s *OrganizationsServiceOp) GetAllOrganizations(ctx context.Context) (*Organizations, *atlas.Response, error) {
 
@@ -79,7 +79,7 @@ func (s *OrganizationsServiceOp) GetAllOrganizations(ctx context.Context) (*Orga
 	return root, resp, nil
 }
 
-// GetOneOrganization gets a single project.
+// GetOneOrganization gets a single organization.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/organizations/organization-get-one/
 func (s *OrganizationsServiceOp) GetOneOrganization(ctx context.Context, orgID string) (*Organization, *atlas.Response, error) {
 	if orgID == "" {
@@ -102,7 +102,7 @@ func (s *OrganizationsServiceOp) GetOneOrganization(ctx context.Context, orgID s
 	return root, resp, err
 }
 
-// GetProjects gets a single project by its name.
+// GetProjects gets all projects for the given organization ID
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/organizations/organization-get-all-projects/
 func (s *OrganizationsServiceOp) GetProjects(ctx context.Context, orgID string) (*Projects, *atlas.Response, error) {
 	if orgID == "" {
