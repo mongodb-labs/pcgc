@@ -45,6 +45,7 @@ type Client struct {
 	BaseURL   *url.URL
 	UserAgent string
 
+	Organizations    OrganizationsService
 	Projects         ProjectsService
 	AutomationConfig AutomationService
 
@@ -68,6 +69,7 @@ func NewClient(httpClient *http.Client) *Client {
 		UserAgent: DefaultUserAgent,
 	}
 
+	c.Organizations = &OrganizationsServiceOp{client: c}
 	c.Projects = &ProjectsServiceOp{client: c}
 	c.AutomationConfig = &AutomationServiceOp{client: c}
 
