@@ -26,13 +26,15 @@ const (
 	orgsBasePath = "orgs"
 )
 
-// OrganizationsService is an interface for interfacing with the Projects
+// OrganizationsService is an interface for interfacing with the Organizations
 // endpoints of the MongoDB Atlas API.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/organizations/
 type OrganizationsService interface {
 	GetAllOrganizations(context.Context) (*Organizations, *atlas.Response, error)
 	GetOneOrganization(context.Context, string) (*Organization, *atlas.Response, error)
 	GetProjects(context.Context, string) (*Projects, *atlas.Response, error)
+	Create(context.Context, *Organization) (*Organization, *atlas.Response, error)
+	Delete(context.Context, string) (*atlas.Response, error)
 }
 
 // OrganizationsServiceOp handles communication with the Projects related methods of the
@@ -123,4 +125,44 @@ func (s *OrganizationsServiceOp) GetProjects(ctx context.Context, orgID string) 
 	}
 
 	return root, resp, err
+}
+
+// Create creates an organization.
+// See more: https://docs.cloudmanager.mongodb.com/reference/api/organizations/organization-create-one/
+func (s *OrganizationsServiceOp) Create(ctx context.Context, createRequest *Organization) (*Organization, *atlas.Response, error) {
+	if createRequest == nil {
+		return nil, nil, atlas.NewArgError("createRequest", "cannot be nil")
+	}
+
+	req, err := s.client.NewRequest(ctx, http.MethodPost, orgsBasePath, createRequest)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(Organization)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, err
+}
+
+// Delete deletes an organization.
+// See more: https://docs.cloudmanager.mongodb.com/reference/api/organizations/organization-delete-one/
+func (s *OrganizationsServiceOp) Delete(ctx context.Context, orgID string) (*atlas.Response, error) {
+	if orgID == "" {
+		return nil, atlas.NewArgError("orgID", "must be set")
+	}
+
+	basePath := fmt.Sprintf("%s/%s", orgsBasePath, orgID)
+
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, basePath, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(ctx, req, nil)
+
+	return resp, err
 }

@@ -224,3 +224,59 @@ func TestOrganizations_GetProjects(t *testing.T) {
 		t.Error(diff)
 	}
 }
+
+func TestOrganizations_Create(t *testing.T) {
+	setup()
+	defer teardown()
+
+	createRequest := &Organization{
+		Name: "OrgFoobar",
+	}
+
+	mux.HandleFunc("/orgs", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprint(w, `{
+			"id": "5a0a1e7e0f2912c554080adc",
+			"links": [{
+				"href": "https://cloud.mongodb.com/api/public/v1.0/orgs/5a0a1e7e0f2912c554080adc",
+				"rel": "self"
+			}],
+			"name": "OrgFoobar"
+		}`)
+	})
+
+	org, _, err := client.Organizations.Create(ctx, createRequest)
+	if err != nil {
+		t.Fatalf("Organizations.Create returned error: %v", err)
+	}
+
+	expected := &Organization{
+		ID: "5a0a1e7e0f2912c554080adc",
+		Links: []*mongodbatlas.Link{
+			{
+				Href: "https://cloud.mongodb.com/api/public/v1.0/orgs/5a0a1e7e0f2912c554080adc",
+				Rel:  "self",
+			},
+		},
+		Name: "OrgFoobar",
+	}
+
+	if diff := deep.Equal(org, expected); diff != nil {
+		t.Error(diff)
+	}
+}
+
+func TestOrganizations_Delete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	orgID := "5a0a1e7e0f2912c554080adc"
+
+	mux.HandleFunc(fmt.Sprintf("/orgs/%s", orgID), func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodDelete)
+	})
+
+	_, err := client.Organizations.Delete(ctx, orgID)
+	if err != nil {
+		t.Fatalf("Organizations.Delete returned error: %v", err)
+	}
+}
