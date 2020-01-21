@@ -27,7 +27,7 @@ const (
 )
 
 // ProjectsService is an interface for interfacing with the Projects
-// endpoints of the MongoDB Atlas API.
+// endpoints of the MongoDB Cloud Manager API.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/
 type ProjectsService interface {
 	GetAllProjects(context.Context) (*Projects, *atlas.Response, error)
@@ -37,7 +37,7 @@ type ProjectsService interface {
 	Delete(context.Context, string) (*atlas.Response, error)
 }
 
-// ProjectsServiceOp handles communication with the Projects related methos of the
+// ProjectsServiceOp handles communication with the Projects related methods of the
 // MongoDB Cloud Manager API
 type ProjectsServiceOp struct {
 	client *Client
@@ -78,7 +78,7 @@ type Projects struct {
 	TotalCount int           `json:"totalCount"`
 }
 
-// GetAllProjects gets all project.
+// GetAllProjects gets all projects.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-all-groups-for-current-user/
 func (s *ProjectsServiceOp) GetAllProjects(ctx context.Context) (*Projects, *atlas.Response, error) {
 
