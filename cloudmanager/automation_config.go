@@ -105,17 +105,17 @@ type SSL struct {
 
 // Auth authentication config
 type Auth struct {
-	AuthoritativeSet         bool                     `json:"authoritativeSet"`
 	AutoAuthMechanism        string                   `json:"autoAuthMechanism"`
 	AutoUser                 string                   `json:"autoUser,omitempty"`
 	AutoPwd                  string                   `json:"autoPwd,omitempty"`
 	DeploymentAuthMechanisms []string                 `json:"deploymentAuthMechanisms"`
-	Disabled                 bool                     `json:"disabled"`
 	Key                      string                   `json:"key,omitempty"`
 	Keyfile                  string                   `json:"keyfile,omitempty"`
 	KeyfileWindows           string                   `json:"keyfileWindows,omitempty"`
 	UsersDeleted             []interface{}            `json:"usersDeleted"`
 	UsersWanted              []map[string]interface{} `json:"usersWanted"`
+	AuthoritativeSet         bool                     `json:"authoritativeSet"`
+	Disabled                 bool                     `json:"disabled"`
 }
 
 // Member configs
@@ -194,15 +194,15 @@ type LogRotate struct {
 type Process struct {
 	Args26                      Args26     `json:"args2_6"`
 	AuthSchemaVersion           int        `json:"authSchemaVersion,omitempty"`
+	LastGoalVersionAchieved     int        `json:"lastGoalVersionAchieved,omitempty"`
 	Name                        string     `json:"name,omitempty"`
 	Cluster                     string     `json:"cluster,omitempty"`
-	Disabled                    bool       `json:"disabled,omitempty"`
 	FeatureCompatibilityVersion string     `json:"featureCompatibilityVersion,omitempty"`
 	Hostname                    string     `json:"hostname,omitempty"`
-	LastGoalVersionAchieved     int        `json:"lastGoalVersionAchieved,omitempty"`
 	LogRotate                   *LogRotate `json:"logRotate,omitempty"`
-	ManualMode                  bool       `json:"manualMode,omitempty"`
 	Plan                        []string   `json:"plan,omitempty"`
 	ProcessType                 string     `json:"processType,omitempty"`
 	Version                     string     `json:"version,omitempty"`
+	Disabled                    bool       `json:"disabled,omitempty"`
+	ManualMode                  bool       `json:"manualMode,omitempty"`
 }

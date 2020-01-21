@@ -28,7 +28,7 @@ const (
 
 // ProjectsService is an interface for interfacing with the Projects
 // endpoints of the MongoDB Atlas API.
-// See more: https://docs.atlas.mongodb.com/reference/api/projects/
+// See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/
 type ProjectsService interface {
 	GetAllProjects(context.Context) (*Projects, *atlas.Response, error)
 	GetOneProject(context.Context, string) (*Project, *atlas.Response, error)
@@ -37,8 +37,8 @@ type ProjectsService interface {
 	Delete(context.Context, string) (*atlas.Response, error)
 }
 
-//ProjectsServiceOp handles communication with the Projects related methos of the
-//MongoDB Atlas API
+// ProjectsServiceOp handles communication with the Projects related methos of the
+// MongoDB Cloud Manager API
 type ProjectsServiceOp struct {
 	client *Client
 }
@@ -78,8 +78,8 @@ type Projects struct {
 	TotalCount int           `json:"totalCount"`
 }
 
-//GetAllProjects gets all project.
-//See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-all-groups-for-current-user/
+// GetAllProjects gets all project.
+// See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-all-groups-for-current-user/
 func (s *ProjectsServiceOp) GetAllProjects(ctx context.Context) (*Projects, *atlas.Response, error) {
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, projectBasePath, nil)
@@ -100,8 +100,8 @@ func (s *ProjectsServiceOp) GetAllProjects(ctx context.Context) (*Projects, *atl
 	return root, resp, nil
 }
 
-//GetOneProject gets a single project.
-//See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-one-group-by-id/
+// GetOneProject gets a single project.
+// See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-one-group-by-id/
 func (s *ProjectsServiceOp) GetOneProject(ctx context.Context, projectID string) (*Project, *atlas.Response, error) {
 	if projectID == "" {
 		return nil, nil, atlas.NewArgError("projectID", "must be set")
@@ -123,8 +123,8 @@ func (s *ProjectsServiceOp) GetOneProject(ctx context.Context, projectID string)
 	return root, resp, err
 }
 
-//GetOneProjectByName gets a single project by its name.
-//See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-one-group-by-name/
+// GetOneProjectByName gets a single project by its name.
+// See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/get-one-group-by-name/
 func (s *ProjectsServiceOp) GetOneProjectByName(ctx context.Context, projectName string) (*Project, *atlas.Response, error) {
 	if projectName == "" {
 		return nil, nil, atlas.NewArgError("projectName", "must be set")
@@ -146,8 +146,8 @@ func (s *ProjectsServiceOp) GetOneProjectByName(ctx context.Context, projectName
 	return root, resp, err
 }
 
-//Create creates a project.
-//See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/create-one-group/
+// Create creates a project.
+// See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/create-one-group/
 func (s *ProjectsServiceOp) Create(ctx context.Context, createRequest *Project) (*Project, *atlas.Response, error) {
 	if createRequest == nil {
 		return nil, nil, atlas.NewArgError("createRequest", "cannot be nil")
@@ -167,7 +167,7 @@ func (s *ProjectsServiceOp) Create(ctx context.Context, createRequest *Project) 
 	return root, resp, err
 }
 
-//Delete deletes a project.
+// Delete deletes a project.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/groups/delete-one-group/
 func (s *ProjectsServiceOp) Delete(ctx context.Context, projectID string) (*atlas.Response, error) {
 	if projectID == "" {

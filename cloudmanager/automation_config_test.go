@@ -18,8 +18,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
+
+	"github.com/go-test/deep"
 )
 
 const jsonBlob = `{
@@ -184,7 +185,7 @@ func TestAutomationConfig_Get(t *testing.T) {
 
 	config, _, err := client.AutomationConfig.Get(ctx, projectID)
 	if err != nil {
-		t.Errorf("AutomationConfig.Get returned error: %v", err)
+		t.Fatalf("AutomationConfig.Get returned error: %v", err)
 	}
 
 	expected := &AutomationConfig{
@@ -328,9 +329,8 @@ func TestAutomationConfig_Get(t *testing.T) {
 		},
 		Version: 1,
 	}
-
-	if !reflect.DeepEqual(config, expected) {
-		t.Errorf("AutomationConfig.Get\n got=%#v\nwant=%#v", config, expected)
+	if diff := deep.Equal(config, expected); diff != nil {
+		t.Error(diff)
 	}
 }
 
@@ -493,6 +493,6 @@ func TestAutomationConfig_Update(t *testing.T) {
 
 	_, err := client.AutomationConfig.Update(ctx, projectID, updateRequest)
 	if err != nil {
-		t.Errorf("AutomationConfig.Update returned error: %v", err)
+		t.Fatalf("AutomationConfig.Update returned error: %v", err)
 	}
 }
