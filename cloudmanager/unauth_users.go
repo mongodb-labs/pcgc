@@ -23,27 +23,27 @@ import (
 )
 
 const (
-	unAuthBasePath = "unauth/users"
+	usersBasePath = APIUnauthPath + "users"
 )
 
 // UnAuthService is an interface for interfacing with unauthenticated APIs
-type UnauthService interface {
+type UnauthUsersService interface {
 	CreateFirstUser(context.Context, *User, string) (*CreateUserResponse, *atlas.Response, error)
 }
 
 // UnAuthServiceOp handles communication with the unauthenticated API
-type UnauthServiceOp struct {
+type UnauthUsersServiceOp struct {
 	client *Client
 }
 
 // See more: https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
-func (s *UnauthServiceOp) CreateFirstUser(ctx context.Context, user *User, whitelistIP string) (*CreateUserResponse, *atlas.Response, error) {
+func (s *UnauthUsersServiceOp) CreateFirstUser(ctx context.Context, user *User, whitelistIP string) (*CreateUserResponse, *atlas.Response, error) {
 	// if a whitelist was not specified, do not pass the parameter
 	var basePath string
 	if whitelistIP == "" {
-		basePath = unAuthBasePath
+		basePath = usersBasePath
 	} else {
-		basePath = fmt.Sprintf("%s?whitelist=%s", unAuthBasePath, whitelistIP)
+		basePath = fmt.Sprintf("%s?whitelist=%s", usersBasePath, whitelistIP)
 	}
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, basePath, user)

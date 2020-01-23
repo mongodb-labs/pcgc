@@ -28,14 +28,12 @@ import (
 )
 
 const (
-	// Version for client
-	Version = "0.1"
-	// DefaultBaseURL API default base URL for cloud manager
-	DefaultBaseURL = "https://cloud.mongodb.com" + APIPublicV1Path
-	// DefaultAPIPath default root path for all API endpoints
-	APIPublicV1Path = "/api/public/v1.0/"
-	// DefaultUserAgent To be submitted by the client
-	DefaultUserAgent = "pcgc/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
+	Version          = "0.1" // Version for client
+	CloudURL         = "https://cloud.mongodb.com"
+	DefaultBaseURL   = CloudURL + APIPublicV1Path                                            // DefaultBaseURL API default base URL for cloud manager
+	APIPublicV1Path  = "/api/public/v1.0/"                                                   // DefaultAPIPath default root path for all API endpoints
+	APIUnauthPath    = "/unauth/"                                                            // APIUnauthPath the unauthenticated API
+	DefaultUserAgent = "pcgc/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")" // DefaultUserAgent To be submitted by the client
 	mediaType        = "application/json"
 )
 
@@ -48,7 +46,7 @@ type Client struct {
 	Organizations    OrganizationsService
 	Projects         ProjectsService
 	AutomationConfig AutomationService
-	Unauth           UnauthService
+	UnauthUsers      UnauthUsersService
 
 	onRequestCompleted RequestCompletionCallback
 }
@@ -56,7 +54,7 @@ type Client struct {
 // RequestCompletionCallback defines the type of the request callback function
 type RequestCompletionCallback func(*http.Request, *http.Response)
 
-// NewClient returns a new MongoDBAtlas API Client
+// NewClient returns a new Cloud Manager API Client
 func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
@@ -73,7 +71,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Organizations = &OrganizationsServiceOp{client: c}
 	c.Projects = &ProjectsServiceOp{client: c}
 	c.AutomationConfig = &AutomationServiceOp{client: c}
-	c.Unauth = &UnauthServiceOp{client: c}
+	c.UnauthUsers = &UnauthUsersServiceOp{client: c}
 
 	return c
 }
