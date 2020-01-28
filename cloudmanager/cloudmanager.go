@@ -32,7 +32,6 @@ const (
 	CloudURL         = "https://cloud.mongodb.com"
 	DefaultBaseURL   = CloudURL + APIPublicV1Path                                            // DefaultBaseURL API default base URL for cloud manager
 	APIPublicV1Path  = "/api/public/v1.0/"                                                   // DefaultAPIPath default root path for all API endpoints
-	APIUnauthPath    = "/unauth/"                                                            // APIUnauthPath the unauthenticated API
 	DefaultUserAgent = "pcgc/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")" // DefaultUserAgent To be submitted by the client
 	mediaType        = "application/json"
 )

@@ -56,7 +56,7 @@ func TestUnauth_CreateFirstUser(t *testing.T) {
 		}`)
 	})
 
-	user, _, err := client.UnauthUsers.CreateFirstUser(ctx, createRequest, "")
+	user, _, err := client.UnauthUsers.CreateFirstUser(ctx, createRequest, nil)
 	if err != nil {
 		t.Fatalf("Unauth.CreateFirstUser returned error: %v", err)
 	}

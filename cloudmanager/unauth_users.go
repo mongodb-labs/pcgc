@@ -19,31 +19,36 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/google/go-querystring/query"
 	atlas "github.com/mongodb/go-client-mongodb-atlas/mongodbatlas"
 )
 
 const (
-	usersBasePath = APIUnauthPath + "users"
+	unauthUsersBasePath = "unauth/users"
 )
 
-// UnAuthService is an interface for interfacing with unauthenticated APIs
+// UnauthUsersService is an interface for interfacing with unauthenticated APIs
 type UnauthUsersService interface {
-	CreateFirstUser(context.Context, *User, string) (*CreateUserResponse, *atlas.Response, error)
+	CreateFirstUser(context.Context, *User, *WhitelistOpts) (*CreateUserResponse, *atlas.Response, error)
 }
 
-// UnAuthServiceOp handles communication with the unauthenticated API
+// UnauthUsersServiceOp handles communication with the unauthenticated API
 type UnauthUsersServiceOp struct {
 	client *Client
 }
 
+// CreateFirstUser creates the first user for a new installation
 // See more: https://docs.opsmanager.mongodb.com/master/reference/api/user-create-first/
-func (s *UnauthUsersServiceOp) CreateFirstUser(ctx context.Context, user *User, whitelistIP string) (*CreateUserResponse, *atlas.Response, error) {
+func (s *UnauthUsersServiceOp) CreateFirstUser(ctx context.Context, user *User, opts *WhitelistOpts) (*CreateUserResponse, *atlas.Response, error) {
 	// if a whitelist was not specified, do not pass the parameter
-	var basePath string
-	if whitelistIP == "" {
-		basePath = usersBasePath
-	} else {
-		basePath = fmt.Sprintf("%s?whitelist=%s", usersBasePath, whitelistIP)
+	basePath := unauthUsersBasePath
+
+	if opts != nil {
+		v, err := query.Values(opts)
+		if err != nil {
+			return nil, nil, err
+		}
+		basePath = fmt.Sprintf("%s?%s", unauthUsersBasePath, v.Encode())
 	}
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, basePath, user)
@@ -60,7 +65,11 @@ func (s *UnauthUsersServiceOp) CreateFirstUser(ctx context.Context, user *User, 
 	return root, resp, err
 }
 
-// UserResponse wrapper for a user response, augmented with a few extra fields
+type WhitelistOpts struct {
+	Whitelist string `url:"whitelist"`
+}
+
+// User wrapper for a user response, augmented with a few extra fields
 type User struct {
 	Username     string        `json:"username"`
 	Password     string        `json:"password,omitempty"`
