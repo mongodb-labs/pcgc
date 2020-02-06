@@ -66,7 +66,7 @@ func (s *UnauthUsersServiceOp) CreateFirstUser(ctx context.Context, user *User, 
 }
 
 type WhitelistOpts struct {
-	Whitelist string `url:"whitelist"`
+	Whitelist []string `url:"whitelist"`
 }
 
 // User wrapper for a user response, augmented with a few extra fields
