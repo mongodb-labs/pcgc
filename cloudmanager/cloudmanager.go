@@ -44,7 +44,8 @@ type Client struct {
 
 	Organizations    OrganizationsService
 	Projects         ProjectsService
-	AutomationConfig AutomationService
+	AutomationConfig AutomationConfigService
+	AutomationStatus AutomationStatusService
 	UnauthUsers      UnauthUsersService
 
 	onRequestCompleted RequestCompletionCallback
@@ -69,7 +70,8 @@ func NewClient(httpClient *http.Client) *Client {
 
 	c.Organizations = &OrganizationsServiceOp{client: c}
 	c.Projects = &ProjectsServiceOp{client: c}
-	c.AutomationConfig = &AutomationServiceOp{client: c}
+	c.AutomationConfig = &AutomationConfigServiceOp{client: c}
+	c.AutomationStatus = &AutomationStatusServiceOp{client: c}
 	c.UnauthUsers = &UnauthUsersServiceOp{client: c}
 
 	return c
