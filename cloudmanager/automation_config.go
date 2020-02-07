@@ -23,25 +23,25 @@ import (
 )
 
 const (
-	automationBasePath = "groups/%s/automationConfig"
+	automationConfigBasePath = "groups/%s/automationConfig"
 )
 
-// AutomationService is an interface for interfacing with the Automation Config
+// AutomationConfigService is an interface for interfacing with the Automation Config
 // endpoints of the MongoDB CLoud API.
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/automation-config/
-type AutomationService interface {
+type AutomationConfigService interface {
 	Get(context.Context, string) (*AutomationConfig, *atlas.Response, error)
 	Update(context.Context, string, *AutomationConfig) (*atlas.Response, error)
 }
 
-// AutomationServiceOp handles communication with the Automation config related methods of the MongoDB Cloud API
-type AutomationServiceOp struct {
+// AutomationConfigServiceOp handles communication with the Automation config related methods of the MongoDB Cloud API
+type AutomationConfigServiceOp struct {
 	client *Client
 }
 
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/automation-config/#get-the-automation-configuration
-func (s *AutomationServiceOp) Get(ctx context.Context, groupID string) (*AutomationConfig, *atlas.Response, error) {
-	basePath := fmt.Sprintf(automationBasePath, groupID)
+func (s *AutomationConfigServiceOp) Get(ctx context.Context, groupID string) (*AutomationConfig, *atlas.Response, error) {
+	basePath := fmt.Sprintf(automationConfigBasePath, groupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, basePath, nil)
 	if err != nil {
@@ -58,8 +58,8 @@ func (s *AutomationServiceOp) Get(ctx context.Context, groupID string) (*Automat
 }
 
 // See more: https://docs.cloudmanager.mongodb.com/reference/api/automation-config/#update-the-automation-configuration
-func (s *AutomationServiceOp) Update(ctx context.Context, groupID string, updateRequest *AutomationConfig) (*atlas.Response, error) {
-	basePath := fmt.Sprintf(automationBasePath, groupID)
+func (s *AutomationConfigServiceOp) Update(ctx context.Context, groupID string, updateRequest *AutomationConfig) (*atlas.Response, error) {
+	basePath := fmt.Sprintf(automationConfigBasePath, groupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, basePath, updateRequest)
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *AutomationServiceOp) Update(ctx context.Context, groupID string, update
 	return resp, err
 }
 
-var _ AutomationService = new(AutomationServiceOp)
+var _ AutomationConfigService = new(AutomationConfigServiceOp)
 
 type AutomationConfig struct {
 	AgentVersion       *map[string]interface{}   `json:"agentVersion,omitempty"`
