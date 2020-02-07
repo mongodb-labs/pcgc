@@ -84,19 +84,19 @@ type Role struct {
 
 // Member configs
 type Member struct {
-	ID          int    `json:"_id"`
-	ArbiterOnly bool   `json:"arbiterOnly"`
-	Hidden      bool   `json:"hidden"`
-	Host        string `json:"host"`
-	Priority    int    `json:"priority"`
-	SlaveDelay  int    `json:"slaveDelay"`
-	Votes       int    `json:"votes"`
+	ID          int     `json:"_id"`
+	ArbiterOnly bool    `json:"arbiterOnly"`
+	Hidden      bool    `json:"hidden"`
+	Host        string  `json:"host"`
+	Priority    float64 `json:"priority"`
+	SlaveDelay  int     `json:"slaveDelay"`
+	Votes       float64 `json:"votes"`
 }
 
 // ReplicaSet configs
 type ReplicaSet struct {
 	ID              string   `json:"_id"`
-	ProtocolVersion int      `json:"protocolVersion,omitempty"`
+	ProtocolVersion string   `json:"protocolVersion,omitempty"`
 	Members         []Member `json:"members"`
 }
 
