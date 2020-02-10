@@ -3,7 +3,7 @@ export PATH := ./bin:$(PATH)
 
 TEST?=$$(go list ./...)
 GOFMT_FILES?=$$(find . -name '*.go')
-GOLANGCI_VERSION=v1.22.2
+GOLANGCI_VERSION=v1.23.3
 
 default: build
 
