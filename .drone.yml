@@ -4,28 +4,30 @@ type: docker
 name: pcgc
 
 platform:
-  arch: amd64
   os: linux
+  arch: amd64
 
 steps:
   - name: test
     image: golang:1.13
-    volumes:
-      - name: deps
-        path: /go
     commands:
       - make test
-  - name: lint
-    image: golangci/golangci-lint:v1.22.2
-    commands:
-      - make lint
-  - name: build
-    image: golang:1.13
     volumes:
       - name: deps
         path: /go
+
+  - name: lint
+    image: golangci/golangci-lint:v1.23.3
+    commands:
+      - make lint
+
+  - name: build
+    image: golang:1.13
     commands:
       - make build
+    volumes:
+      - name: deps
+        path: /go
 
 volumes:
   - name: deps
